@@ -8,31 +8,22 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   create(createUserDto: CreateUserDto) {
-    return this.prisma.user.create({
-      data: createUserDto,
-    });
+    return this.prisma.usuario.create({ data: createUserDto as any });
   }
 
   findAll() {
-    return this.prisma.user.findMany();
+    return this.prisma.usuario.findMany();
   }
 
-  findOne(id: number) {
-    return this.prisma.user.findUnique({
-      where: { id },
-    });
+  findOne(id: string) {
+    return this.prisma.usuario.findUnique({ where: { id } });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.prisma.user.update({
-      where: { id },
-      data: updateUserDto,
-    });
+  update(id: string, updateUserDto: UpdateUserDto) {
+    return this.prisma.usuario.update({ where: { id }, data: updateUserDto as any });
   }
 
-  remove(id: number) {
-    return this.prisma.user.delete({
-      where: { id },
-    });
+  remove(id: string) {
+    return this.prisma.usuario.delete({ where: { id } });
   }
 }

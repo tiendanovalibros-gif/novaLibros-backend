@@ -1,0 +1,34 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { ItemsPedidoService } from './items-pedido.service';
+import { CreateItemsPedidoDto } from './dto/create-items-pedido.dto';
+import { UpdateItemsPedidoDto } from './dto/update-items-pedido.dto';
+
+@Controller('items-pedido')
+export class ItemsPedidoController {
+  constructor(private readonly itemsPedidoService: ItemsPedidoService) {}
+
+  @Post()
+  create(@Body() createItemsPedidoDto: CreateItemsPedidoDto) {
+    return this.itemsPedidoService.create(createItemsPedidoDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.itemsPedidoService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.itemsPedidoService.findOne(+id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateItemsPedidoDto: UpdateItemsPedidoDto) {
+    return this.itemsPedidoService.update(+id, updateItemsPedidoDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.itemsPedidoService.remove(+id);
+  }
+}

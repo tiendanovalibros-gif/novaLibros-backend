@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -13,10 +7,380 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
+// ─── Enums ───
+
+enum RolUsuario {
+  root
+  administrador
+  cliente
+  visitante
+}
+
+enum EstadoLibro {
+  nuevo
+  usado
+}
+
+enum EstadoReserva {
+  activa
+  expirada
+  cancelada
+  convertida
+}
+
+enum MetodoEntrega {
+  domicilio
+  tienda
+}
+
+enum EstadoPedidoVal {
+  en_preparacion
+  enviado
+  entregado
+}
+
+enum EstadoDevolucion {
+  solicitada
+  aprobada
+  rechazada
+}
+
+enum TipoTarjeta {
+  credito
+  debito
+}
+
+enum TipoMovimiento {
+  recarga
+  compra
+  devolucion
+  bono
+}
+
+// ─── Modelos ───
+
+model Autor {
+  id     Int    @id @default(autoincrement()) @map("id")
+  nombre String
+
+  libros Libro[]
+
+  @@map("autor")
+}
+
+model Genero {
+  id     Int    @id @default(autoincrement())
+  nombre String
+
+  libros Libro[]
+
+  @@map("genero")
+}
+
+model Editorial {
+  id     Int    @id @default(autoincrement())
+  nombre String
+
+  libros Libro[]
+
+  @@map("editorial")
+}
+
+model Tienda {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  nombre    String
+  direccion String
+  latitud   Decimal
+  longitud  Decimal
+
+  inventarios Inventario[]
+  pedidos     Pedido[]
+
+  @@map("tienda")
+}
+
+model Usuario {
+  id               String      @id @default(uuid()) @db.Uuid
+  dni              String
+  nombre           String
+  apellido         String
+  fechaNacimiento  DateTime    @map("fecha_nacimiento") @db.Date
+  correo           String      @unique
+  contrasenaHash   String      @map("contrasena_hash")
+  direccion        String?
+  telefono         String?
+  rol              RolUsuario
+  estadoCuenta     Boolean     @map("estado_cuenta")
+  fechaRegistro    DateTime    @default(now()) @map("fecha_registro") @db.Timestamptz()
+
+  reservas           Reserva[]
+  carritos           CarritoCompras[]
+  pedidos            Pedido[]
+  devoluciones       Devolucion[]
+  facturasElectronicas FacturaElectronica[]
+  suscripciones      Suscripcion[]
+  mensajes           Mensaje[]
+  metodosPago        MetodoPago[]
+  saldoUsuario       SaldoUsuario[]
+  movimientosSaldo   MovimientoSaldo[]
+  registrosBusqueda  RegistroBusqueda[]
+  bonosCumpleanios   BonoCumpleanios[]
+
+  @@map("usuario")
+}
+
+model Libro {
+  id              String      @id @default(uuid()) @db.Uuid
+  titulo          String
+  idAutor         Int         @map("id_autor")
+  idGenero        Int         @map("id_genero")
+  idEditorial     Int         @map("id_editorial")
+  anoPublicacion  Int         @map("ano_publicacion")
+  precio          Decimal
+  isbn            String
+  idioma          String
+  descripcion     String?
+  imagenPortada   String?     @map("imagen_portada")
+  estado          EstadoLibro
+
+  autor     Autor     @relation(fields: [idAutor], references: [id])
+  genero    Genero    @relation(fields: [idGenero], references: [id])
+  editorial Editorial @relation(fields: [idEditorial], references: [id])
+
+  inventarios    Inventario[]
+  itemsReserva   ItemReserva[]
+  detallesCarrito DetalleCarrito[]
+  itemsPedido    ItemPedido[]
+
+  @@map("libro")
+}
+
+model Inventario {
+  id                  Int      @id @default(autoincrement())
+  idLibro             String   @map("id_libro") @db.Uuid
+  idTienda            Int      @map("id_tienda")
+  cantidadDisponible  Int      @map("cantidad_disponible")
+  cantidadBloqueada   Int      @map("cantidad_bloqueada")
+  fechaActualizacion  DateTime @map("fecha_actualizacion") @db.Timestamptz()
+
+  libro  Libro  @relation(fields: [idLibro], references: [id])
+  tienda Tienda @relation(fields: [idTienda], references: [id])
+
+  @@map("inventario")
+}
+
+model Reserva {
+  id              String        @id @default(uuid()) @db.Uuid
+  idUsuario       String        @map("id_usuario") @db.Uuid
+  horaCreacion    DateTime      @map("hora_creacion") @db.Timestamptz()
+  horaExpiracion  DateTime      @map("hora_expiracion") @db.Timestamptz()
+  estado          EstadoReserva
+
+  usuario      Usuario       @relation(fields: [idUsuario], references: [id])
+  itemsReserva ItemReserva[]
+
+  @@map("reserva")
+}
+
+model ItemReserva {
+  id        Int    @id @default(autoincrement())
+  idReserva String @map("id_reserva") @db.Uuid
+  idLibro   String @map("id_libro") @db.Uuid
+  cantidad  Int
+
+  reserva Reserva @relation(fields: [idReserva], references: [id])
+  libro   Libro   @relation(fields: [idLibro], references: [id])
+
+  @@map("item_reserva")
+}
+
+model CarritoCompras {
+  id                 Int      @id @default(autoincrement())
+  idUsuario          String   @map("id_usuario") @db.Uuid
+  fechaCreacion      DateTime @map("fecha_creacion") @db.Timestamptz()
+  fechaActualizacion DateTime @map("fecha_actualizacion") @db.Timestamptz()
+
+  usuario  Usuario          @relation(fields: [idUsuario], references: [id])
+  detalles DetalleCarrito[]
+
+  @@map("carrito_compras")
+}
+
+model DetalleCarrito {
+  id             Int     @id @default(autoincrement())
+  idCarrito      Int     @map("id_carrito")
+  idLibro        String  @map("id_libro") @db.Uuid
+  cantidad       Int
+  precioUnitario Decimal @map("precio_unitario")
+
+  carrito CarritoCompras @relation(fields: [idCarrito], references: [id])
+  libro   Libro          @relation(fields: [idLibro], references: [id])
+
+  @@map("detalle_carrito")
+}
+
+model Pedido {
+  id               String        @id @default(uuid()) @db.Uuid
+  idUsuario        String        @map("id_usuario") @db.Uuid
+  numeroOrden      String        @map("numero_orden")
+  fechaOrden       DateTime      @map("fecha_orden") @db.Timestamptz()
+  montoTotal       Decimal       @map("monto_total")
+  metodoEntrega    MetodoEntrega @map("metodo_entrega")
+  idTienda         Int?          @map("id_tienda")
+  direccionEntrega String?       @map("direccion_entrega")
+
+  usuario          Usuario              @relation(fields: [idUsuario], references: [id])
+  tienda           Tienda?              @relation(fields: [idTienda], references: [id])
+  itemsPedido      ItemPedido[]
+  estadosPedido    EstadoPedido[]
+  devoluciones     Devolucion[]
+  facturas         FacturaElectronica[]
+  movimientosSaldo MovimientoSaldo[]
+
+  @@map("pedido")
+}
+
+model ItemPedido {
+  id             Int     @id @default(autoincrement())
+  idPedido       String  @map("id_pedido") @db.Uuid
+  idLibro        String  @map("id_libro") @db.Uuid
+  cantidad       Int
+  precioUnitario Decimal @map("precio_unitario")
+
+  pedido Pedido @relation(fields: [idPedido], references: [id])
+  libro  Libro  @relation(fields: [idLibro], references: [id])
+
+  @@map("item_pedido")
+}
+
+model EstadoPedido {
+  id          Int             @id @default(autoincrement())
+  idPedido    String          @map("id_pedido") @db.Uuid
+  estado      EstadoPedidoVal
+  fechaCambio DateTime        @map("fecha_cambio") @db.Timestamptz()
+
+  pedido Pedido @relation(fields: [idPedido], references: [id])
+
+  @@map("estado_pedido")
+}
+
+model Devolucion {
+  id          String           @id @default(uuid()) @db.Uuid
+  idPedido    String           @map("id_pedido") @db.Uuid
+  idUsuario   String           @map("id_usuario") @db.Uuid
+  razon       String
+  descripcion String?
+  estado      EstadoDevolucion
+  codigoQr    String?          @map("codigo_qr")
+
+  pedido  Pedido  @relation(fields: [idPedido], references: [id])
+  usuario Usuario @relation(fields: [idUsuario], references: [id])
+
+  @@map("devolucion")
+}
+
+model FacturaElectronica {
+  id             String  @id @default(uuid()) @db.Uuid
+  idPedido       String  @map("id_pedido") @db.Uuid
+  idUsuario      String  @map("id_usuario") @db.Uuid
+  montoSubtotal  Decimal @map("monto_subtotal")
+  iva            Decimal
+  montoTotal     Decimal @map("monto_total")
+
+  pedido  Pedido  @relation(fields: [idPedido], references: [id])
+  usuario Usuario @relation(fields: [idUsuario], references: [id])
+
+  @@map("factura_electronica")
+}
+
+model Suscripcion {
+  id        Int     @id @default(autoincrement())
+  idUsuario String  @map("id_usuario") @db.Uuid
+  activa    Boolean
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id])
+
+  @@map("suscripcion")
+}
+
+model Foro {
+  id            Int      @id @default(autoincrement())
+  titulo        String
+  fechaCreacion DateTime @map("fecha_creacion") @db.Timestamptz()
+
+  mensajes Mensaje[]
+
+  @@map("foro")
+}
+
+model Mensaje {
+  id          String   @id @default(uuid()) @db.Uuid
+  idForo      Int      @map("id_foro")
+  idRemitente String   @map("id_remitente") @db.Uuid
+  contenido   String
+  fechaHora   DateTime @map("fecha_hora") @db.Timestamptz()
+
+  foro      Foro    @relation(fields: [idForo], references: [id])
+  remitente Usuario @relation(fields: [idRemitente], references: [id])
+
+  @@map("mensaje")
+}
+
+model MetodoPago {
+  id                Int         @id @default(autoincrement())
+  idUsuario         String      @map("id_usuario") @db.Uuid
+  tipo              TipoTarjeta
+  numeroEnmascarado String      @map("numero_enmascarado")
+  titular           String
+
+  usuario          Usuario           @relation(fields: [idUsuario], references: [id])
+  movimientosSaldo MovimientoSaldo[]
+
+  @@map("metodo_pago")
+}
+
+model SaldoUsuario {
+  id              Int     @id @default(autoincrement())
+  idUsuario       String  @map("id_usuario") @db.Uuid
+  saldoDisponible Decimal @map("saldo_disponible")
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id])
+
+  @@map("saldo_usuario")
+}
+
+model MovimientoSaldo {
+  id             Int            @id @default(autoincrement())
+  idUsuario      String         @map("id_usuario") @db.Uuid
+  tipoMovimiento TipoMovimiento @map("tipo_movimiento")
+  monto          Decimal
+  idPedido       String?        @map("id_pedido") @db.Uuid
+  idMetodoPago   Int?           @map("id_metodo_pago")
+
+  usuario    Usuario     @relation(fields: [idUsuario], references: [id])
+  pedido     Pedido?     @relation(fields: [idPedido], references: [id])
+  metodoPago MetodoPago? @relation(fields: [idMetodoPago], references: [id])
+
+  @@map("movimiento_saldo")
+}
+
+model RegistroBusqueda {
+  id        Int    @id @default(autoincrement())
+  idUsuario String @map("id_usuario") @db.Uuid
+  criterio  String
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id])
+
+  @@map("registro_busqueda")
+}
+
+model BonoCumpleanios {
+  id                   Int      @id @default(autoincrement())
+  idUsuario            String   @map("id_usuario") @db.Uuid
+  porcentajeDescuento  Decimal  @map("porcentaje_descuento")
+  fechaVigencia        DateTime @map("fecha_vigencia") @db.Date
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id])
+
+  @@map("bono_cumpleanios")
 }

@@ -1,4 +1,12 @@
 export class CreateUserDto {
-	email: string;
-	name: string;
+  dni: string;
+  nombre: string;
+  apellido: string;
+  fechaNacimiento: string;
+  correo: string;
+  contrasenaHash: string;
+  direccion?: string;
+  telefono?: string;
+  rol: string;
+  estadoCuenta: boolean;
 }
