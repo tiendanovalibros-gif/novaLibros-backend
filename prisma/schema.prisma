@@ -124,6 +124,7 @@ model Usuario {
   movimientosSaldo   MovimientoSaldo[]
   registrosBusqueda  RegistroBusqueda[]
   bonosCumpleanios   BonoCumpleanios[]
+  preferencias       UsuarioPreferencia[]
 
   @@map("usuario")
 }
@@ -382,4 +383,25 @@ model BonoCumpleanios {
   usuario Usuario @relation(fields: [idUsuario], references: [id])
 
   @@map("bono_cumpleanios")
+}
+
+model PreferenciaLiteraria {
+  id     Int    @id @default(autoincrement())
+  nombre String @unique
+
+  usuarios UsuarioPreferencia[]
+
+  @@map("preferencia_literaria")
+}
+
+model UsuarioPreferencia {
+  id                     Int    @id @default(autoincrement())
+  idUsuario              String @map("id_usuario") @db.Uuid
+  idPreferenciaLiteraria Int    @map("id_preferencia_literaria")
+
+  usuario              Usuario              @relation(fields: [idUsuario], references: [id])
+  preferenciaLiteraria PreferenciaLiteraria @relation(fields: [idPreferenciaLiteraria], references: [id])
+
+  @@unique([idUsuario, idPreferenciaLiteraria])
+  @@map("usuario_preferencia")
 }

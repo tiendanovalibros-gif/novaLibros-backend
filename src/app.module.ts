@@ -26,9 +26,11 @@ import { SaldosUsuarioModule } from './saldos-usuario/saldos-usuario.module';
 import { MovimientosSaldoModule } from './movimientos-saldo/movimientos-saldo.module';
 import { RegistrosBusquedaModule } from './registros-busqueda/registros-busqueda.module';
 import { BonosCumpleaniosModule } from './bonos-cumpleanios/bonos-cumpleanios.module';
+import { PreferenciasLiterariasModule } from './preferencias-literarias/preferencias-literarias.module';
+import { UsuariosPreferenciasModule } from './usuarios-preferencias/usuarios-preferencias.module';
 
 @Module({
-  imports: [UsersModule, PrismaModule, AutoresModule, GenerosModule, EditorialesModule, TiendasModule, LibrosModule, InventariosModule, ReservasModule, ItemsReservaModule, CarritosModule, DetallesCarritoModule, PedidosModule, EstadosPedidoModule, DevolucionesModule, FacturasModule, SuscripcionesModule, ItemsPedidoModule, ForosModule, MensajesModule, MetodosPagoModule, SaldosUsuarioModule, MovimientosSaldoModule, RegistrosBusquedaModule, BonosCumpleaniosModule],
+  imports: [UsersModule, PrismaModule, AutoresModule, GenerosModule, EditorialesModule, TiendasModule, LibrosModule, InventariosModule, ReservasModule, ItemsReservaModule, CarritosModule, DetallesCarritoModule, PedidosModule, EstadosPedidoModule, DevolucionesModule, FacturasModule, SuscripcionesModule, ItemsPedidoModule, ForosModule, MensajesModule, MetodosPagoModule, SaldosUsuarioModule, MovimientosSaldoModule, RegistrosBusquedaModule, BonosCumpleaniosModule, PreferenciasLiterariasModule, UsuariosPreferenciasModule],
   controllers: [AppController],
   providers: [AppService],
 })
