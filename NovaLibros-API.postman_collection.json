@@ -1,0 +1,1382 @@
+{
+  "info": {
+    "name": "NovaLibros API",
+    "description": "Colección completa de endpoints de la API NovaLibros",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"usuario@example.com\",\n  \"contrasena\": \"password123\",\n  \"nombre\": \"Nombre Usuario\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/register",
+              "host": ["{{base_url}}"],
+              "path": ["users", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"usuario@example.com\",\n  \"contrasena\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/login",
+              "host": ["{{base_url}}"],
+              "path": ["users", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users",
+              "host": ["{{base_url}}"],
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/{{userId}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nombre Actualizado\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/{{userId}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/{{userId}}",
+              "host": ["{{base_url}}"],
+              "path": ["users", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Libros",
+      "item": [
+        {
+          "name": "Create Libro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Título del Libro\",\n  \"descripcion\": \"Descripción del libro\",\n  \"precio\": 25.99,\n  \"autorId\": \"{{autorId}}\",\n  \"generoId\": \"{{generoId}}\",\n  \"editorialId\": \"{{editorialId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/libros",
+              "host": ["{{base_url}}"],
+              "path": ["libros"]
+            }
+          }
+        },
+        {
+          "name": "Get All Libros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/libros",
+              "host": ["{{base_url}}"],
+              "path": ["libros"]
+            }
+          }
+        },
+        {
+          "name": "Get Libro by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/libros/{{libroId}}",
+              "host": ["{{base_url}}"],
+              "path": ["libros", "{{libroId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Libro",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Título Actualizado\",\n  \"precio\": 29.99\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/libros/{{libroId}}",
+              "host": ["{{base_url}}"],
+              "path": ["libros", "{{libroId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Libro",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/libros/{{libroId}}",
+              "host": ["{{base_url}}"],
+              "path": ["libros", "{{libroId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Autores",
+      "item": [
+        {
+          "name": "Create Autor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nombre del Autor\",\n  \"biografia\": \"Biografía del autor\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/autores",
+              "host": ["{{base_url}}"],
+              "path": ["autores"]
+            }
+          }
+        },
+        {
+          "name": "Get All Autores",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/autores",
+              "host": ["{{base_url}}"],
+              "path": ["autores"]
+            }
+          }
+        },
+        {
+          "name": "Get Autor by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/autores/{{autorId}}",
+              "host": ["{{base_url}}"],
+              "path": ["autores", "{{autorId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Autor",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nombre Actualizado\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/autores/{{autorId}}",
+              "host": ["{{base_url}}"],
+              "path": ["autores", "{{autorId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Autor",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/autores/{{autorId}}",
+              "host": ["{{base_url}}"],
+              "path": ["autores", "{{autorId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Generos",
+      "item": [
+        {
+          "name": "Create Genero",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nombre del Género\",\n  \"descripcion\": \"Descripción del género\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/generos",
+              "host": ["{{base_url}}"],
+              "path": ["generos"]
+            }
+          }
+        },
+        {
+          "name": "Get All Generos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/generos",
+              "host": ["{{base_url}}"],
+              "path": ["generos"]
+            }
+          }
+        },
+        {
+          "name": "Get Genero by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/generos/{{generoId}}",
+              "host": ["{{base_url}}"],
+              "path": ["generos", "{{generoId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Genero",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nombre Actualizado\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/generos/{{generoId}}",
+              "host": ["{{base_url}}"],
+              "path": ["generos", "{{generoId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Genero",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/generos/{{generoId}}",
+              "host": ["{{base_url}}"],
+              "path": ["generos", "{{generoId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Editoriales",
+      "item": [
+        {
+          "name": "Create Editorial",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nombre de la Editorial\",\n  \"ubicacion\": \"Ubicación\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/editoriales",
+              "host": ["{{base_url}}"],
+              "path": ["editoriales"]
+            }
+          }
+        },
+        {
+          "name": "Get All Editoriales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/editoriales",
+              "host": ["{{base_url}}"],
+              "path": ["editoriales"]
+            }
+          }
+        },
+        {
+          "name": "Get Editorial by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/editoriales/{{editorialId}}",
+              "host": ["{{base_url}}"],
+              "path": ["editoriales", "{{editorialId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Editorial",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nombre Actualizado\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/editoriales/{{editorialId}}",
+              "host": ["{{base_url}}"],
+              "path": ["editoriales", "{{editorialId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Editorial",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/editoriales/{{editorialId}}",
+              "host": ["{{base_url}}"],
+              "path": ["editoriales", "{{editorialId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tiendas",
+      "item": [
+        {
+          "name": "Create Tienda",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nombre de la Tienda\",\n  \"ubicacion\": \"Ubicación\",\n  \"telefono\": \"123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/tiendas",
+              "host": ["{{base_url}}"],
+              "path": ["tiendas"]
+            }
+          }
+        },
+        {
+          "name": "Get All Tiendas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tiendas",
+              "host": ["{{base_url}}"],
+              "path": ["tiendas"]
+            }
+          }
+        },
+        {
+          "name": "Get Tienda by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tiendas/{{tiendaId}}",
+              "host": ["{{base_url}}"],
+              "path": ["tiendas", "{{tiendaId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Tienda",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nombre Actualizado\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/tiendas/{{tiendaId}}",
+              "host": ["{{base_url}}"],
+              "path": ["tiendas", "{{tiendaId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Tienda",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tiendas/{{tiendaId}}",
+              "host": ["{{base_url}}"],
+              "path": ["tiendas", "{{tiendaId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Carritos",
+      "item": [
+        {
+          "name": "Create Carrito",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": \"{{userId}}\",\n  \"estado\": \"activo\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/carritos",
+              "host": ["{{base_url}}"],
+              "path": ["carritos"]
+            }
+          }
+        },
+        {
+          "name": "Get All Carritos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/carritos",
+              "host": ["{{base_url}}"],
+              "path": ["carritos"]
+            }
+          }
+        },
+        {
+          "name": "Get Carrito by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/carritos/{{carritoId}}",
+              "host": ["{{base_url}}"],
+              "path": ["carritos", "{{carritoId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Carrito",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"pagado\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/carritos/{{carritoId}}",
+              "host": ["{{base_url}}"],
+              "path": ["carritos", "{{carritoId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Carrito",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/carritos/{{carritoId}}",
+              "host": ["{{base_url}}"],
+              "path": ["carritos", "{{carritoId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pedidos",
+      "item": [
+        {
+          "name": "Create Pedido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": \"{{userId}}\",\n  \"fecha\": \"2024-03-20\",\n  \"total\": 100.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/pedidos",
+              "host": ["{{base_url}}"],
+              "path": ["pedidos"]
+            }
+          }
+        },
+        {
+          "name": "Get All Pedidos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos",
+              "host": ["{{base_url}}"],
+              "path": ["pedidos"]
+            }
+          }
+        },
+        {
+          "name": "Get Pedido by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{pedidoId}}",
+              "host": ["{{base_url}}"],
+              "path": ["pedidos", "{{pedidoId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Pedido",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"total\": 120.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{pedidoId}}",
+              "host": ["{{base_url}}"],
+              "path": ["pedidos", "{{pedidoId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Pedido",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{pedidoId}}",
+              "host": ["{{base_url}}"],
+              "path": ["pedidos", "{{pedidoId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Inventarios",
+      "item": [
+        {
+          "name": "Create Inventario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"libroId\": \"{{libroId}}\",\n  \"tiendaId\": \"{{tiendaId}}\",\n  \"cantidad\": 50\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/inventarios",
+              "host": ["{{base_url}}"],
+              "path": ["inventarios"]
+            }
+          }
+        },
+        {
+          "name": "Get All Inventarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/inventarios",
+              "host": ["{{base_url}}"],
+              "path": ["inventarios"]
+            }
+          }
+        },
+        {
+          "name": "Get Inventario by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/inventarios/{{inventarioId}}",
+              "host": ["{{base_url}}"],
+              "path": ["inventarios", "{{inventarioId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Inventario",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cantidad\": 75\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/inventarios/{{inventarioId}}",
+              "host": ["{{base_url}}"],
+              "path": ["inventarios", "{{inventarioId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Inventario",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inventarios/{{inventarioId}}",
+              "host": ["{{base_url}}"],
+              "path": ["inventarios", "{{inventarioId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reservas",
+      "item": [
+        {
+          "name": "Create Reserva",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": \"{{userId}}\",\n  \"fecha\": \"2024-03-20\",\n  \"estado\": \"activa\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/reservas",
+              "host": ["{{base_url}}"],
+              "path": ["reservas"]
+            }
+          }
+        },
+        {
+          "name": "Get All Reservas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservas",
+              "host": ["{{base_url}}"],
+              "path": ["reservas"]
+            }
+          }
+        },
+        {
+          "name": "Get Reserva by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservas/{{reservaId}}",
+              "host": ["{{base_url}}"],
+              "path": ["reservas", "{{reservaId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Reserva",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"completada\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/reservas/{{reservaId}}",
+              "host": ["{{base_url}}"],
+              "path": ["reservas", "{{reservaId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Reserva",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reservas/{{reservaId}}",
+              "host": ["{{base_url}}"],
+              "path": ["reservas", "{{reservaId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Otros Endpoints",
+      "item": [
+        {
+          "name": "Detalles Carrito - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"carritoId\": \"{{carritoId}}\",\n  \"libroId\": \"{{libroId}}\",\n  \"cantidad\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/detalles-carrito",
+              "host": ["{{base_url}}"],
+              "path": ["detalles-carrito"]
+            }
+          }
+        },
+        {
+          "name": "Detalles Carrito - Get All",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/detalles-carrito",
+              "host": ["{{base_url}}"],
+              "path": ["detalles-carrito"]
+            }
+          }
+        },
+        {
+          "name": "Items Pedido - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pedidoId\": \"{{pedidoId}}\",\n  \"libroId\": \"{{libroId}}\",\n  \"cantidad\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/items-pedido",
+              "host": ["{{base_url}}"],
+              "path": ["items-pedido"]
+            }
+          }
+        },
+        {
+          "name": "Items Pedido - Get All",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/items-pedido",
+              "host": ["{{base_url}}"],
+              "path": ["items-pedido"]
+            }
+          }
+        },
+        {
+          "name": "Facturas - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pedidoId\": \"{{pedidoId}}\",\n  \"fecha\": \"2024-03-20\",\n  \"monto\": 100.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/facturas",
+              "host": ["{{base_url}}"],
+              "path": ["facturas"]
+            }
+          }
+        },
+        {
+          "name": "Facturas - Get All",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/facturas",
+              "host": ["{{base_url}}"],
+              "path": ["facturas"]
+            }
+          }
+        },
+        {
+          "name": "Devoluciones - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pedidoId\": \"{{pedidoId}}\",\n  \"fecha\": \"2024-03-20\",\n  \"motivo\": \"Producto defectuoso\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/devoluciones",
+              "host": ["{{base_url}}"],
+              "path": ["devoluciones"]
+            }
+          }
+        },
+        {
+          "name": "Devoluciones - Get All",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/devoluciones",
+              "host": ["{{base_url}}"],
+              "path": ["devoluciones"]
+            }
+          }
+        },
+        {
+          "name": "Foros - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Discusión sobre el libro\",\n  \"descripcion\": \"Conversación\",\n  \"libroId\": \"{{libroId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/foros",
+              "host": ["{{base_url}}"],
+              "path": ["foros"]
+            }
+          }
+        },
+        {
+          "name": "Foros - Get All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/foros",
+              "host": ["{{base_url}}"],
+              "path": ["foros"]
+            }
+          }
+        },
+        {
+          "name": "Mensajes - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"foroId\": \"{{foroId}}\",\n  \"usuarioId\": \"{{userId}}\",\n  \"contenido\": \"Mi opinión sobre el libro...\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/mensajes",
+              "host": ["{{base_url}}"],
+              "path": ["mensajes"]
+            }
+          }
+        },
+        {
+          "name": "Mensajes - Get All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/mensajes",
+              "host": ["{{base_url}}"],
+              "path": ["mensajes"]
+            }
+          }
+        },
+        {
+          "name": "Suscripciones - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": \"{{userId}}\",\n  \"tipo\": \"premium\",\n  \"fechaInicio\": \"2024-03-20\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/suscripciones",
+              "host": ["{{base_url}}"],
+              "path": ["suscripciones"]
+            }
+          }
+        },
+        {
+          "name": "Suscripciones - Get All",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/suscripciones",
+              "host": ["{{base_url}}"],
+              "path": ["suscripciones"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "libroId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "autorId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "generoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "editorialId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tiendaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "carritoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pedidoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "inventarioId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "reservaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "foroId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

@@ -6,6 +6,12 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Habilitar CORS para permitir peticiones desde el frontend
+  app.enableCors({
+    origin: true, // Permite cualquier origen en desarrollo
+    credentials: true,
+  });
+
   const config = new DocumentBuilder()
     .setTitle('NovaLibros API')
     .setDescription('API para la gestión de NovaLibros')
