@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { DetallesCarritoService } from './detalles-carrito.service';
 import { CreateDetallesCarritoDto } from './dto/create-detalles-carrito.dto';
 import { UpdateDetallesCarritoDto } from './dto/update-detalles-carrito.dto';
+import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('detalles-carrito')
 export class DetallesCarritoController {
   constructor(private readonly detallesCarritoService: DetallesCarritoService) {}
@@ -12,6 +14,7 @@ export class DetallesCarritoController {
     return this.detallesCarritoService.create(createDetallesCarritoDto);
   }
 
+  @Roles('administrador')
   @Get()
   findAll() {
     return this.detallesCarritoService.findAll();

@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { MetodosPagoService } from './metodos-pago.service';
 import { CreateMetodosPagoDto } from './dto/create-metodos-pago.dto';
 import { UpdateMetodosPagoDto } from './dto/update-metodos-pago.dto';
+import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('metodos-pago')
 export class MetodosPagoController {
   constructor(private readonly metodosPagoService: MetodosPagoService) {}
@@ -12,6 +14,7 @@ export class MetodosPagoController {
     return this.metodosPagoService.create(createMetodosPagoDto);
   }
 
+  @Roles('administrador')
   @Get()
   findAll() {
     return this.metodosPagoService.findAll();

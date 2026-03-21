@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UsuariosPreferenciasService } from './usuarios-preferencias.service';
 import { CreateUsuariosPreferenciaDto } from './dto/create-usuarios-preferencia.dto';
 import { UpdateUsuariosPreferenciaDto } from './dto/update-usuarios-preferencia.dto';
+import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('usuarios-preferencias')
 export class UsuariosPreferenciasController {
   constructor(private readonly usuariosPreferenciasService: UsuariosPreferenciasService) {}
@@ -12,6 +14,7 @@ export class UsuariosPreferenciasController {
     return this.usuariosPreferenciasService.create(createUsuariosPreferenciaDto);
   }
 
+  @Roles('administrador')
   @Get()
   findAll() {
     return this.usuariosPreferenciasService.findAll();

@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ItemsReservaService } from './items-reserva.service';
 import { CreateItemsReservaDto } from './dto/create-items-reserva.dto';
 import { UpdateItemsReservaDto } from './dto/update-items-reserva.dto';
+import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('items-reserva')
 export class ItemsReservaController {
   constructor(private readonly itemsReservaService: ItemsReservaService) {}
@@ -12,6 +14,7 @@ export class ItemsReservaController {
     return this.itemsReservaService.create(createItemsReservaDto);
   }
 
+  @Roles('administrador')
   @Get()
   findAll() {
     return this.itemsReservaService.findAll();
@@ -27,6 +30,7 @@ export class ItemsReservaController {
     return this.itemsReservaService.update(+id, updateItemsReservaDto);
   }
 
+  @Roles('administrador')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.itemsReservaService.remove(+id);

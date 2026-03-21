@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { SuscripcionesService } from './suscripciones.service';
 import { CreateSuscripcioneDto } from './dto/create-suscripcione.dto';
 import { UpdateSuscripcioneDto } from './dto/update-suscripcione.dto';
+import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('suscripciones')
 export class SuscripcionesController {
   constructor(private readonly suscripcionesService: SuscripcionesService) {}
@@ -12,6 +14,7 @@ export class SuscripcionesController {
     return this.suscripcionesService.create(createSuscripcioneDto);
   }
 
+  @Roles('administrador')
   @Get()
   findAll() {
     return this.suscripcionesService.findAll();
@@ -27,6 +30,7 @@ export class SuscripcionesController {
     return this.suscripcionesService.update(+id, updateSuscripcioneDto);
   }
 
+  @Roles('administrador')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.suscripcionesService.remove(+id);
