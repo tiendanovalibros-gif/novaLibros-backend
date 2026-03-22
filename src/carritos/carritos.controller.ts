@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CarritosService } from './carritos.service';
 import { CreateCarritoDto } from './dto/create-carrito.dto';
 import { UpdateCarritoDto } from './dto/update-carrito.dto';
 import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@ApiTags('carritos')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('carritos')
 export class CarritosController {
@@ -30,6 +33,7 @@ export class CarritosController {
     return this.carritosService.update(+id, updateCarritoDto);
   }
 
+  @Roles('administrador')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.carritosService.remove(+id);

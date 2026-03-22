@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { RegistrosBusquedaService } from './registros-busqueda.service';
 import { CreateRegistrosBusquedaDto } from './dto/create-registros-busqueda.dto';
 import { UpdateRegistrosBusquedaDto } from './dto/update-registros-busqueda.dto';
 import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@ApiTags('registros-busqueda')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('registros-busqueda')
 export class RegistrosBusquedaController {

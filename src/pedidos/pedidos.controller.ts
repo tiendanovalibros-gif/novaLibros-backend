@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { PedidosService } from './pedidos.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { UpdatePedidoDto } from './dto/update-pedido.dto';
 import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@ApiTags('pedidos')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('pedidos')
 export class PedidosController {

@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { SuscripcionesService } from './suscripciones.service';
 import { CreateSuscripcioneDto } from './dto/create-suscripcione.dto';
 import { UpdateSuscripcioneDto } from './dto/update-suscripcione.dto';
 import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@ApiTags('suscripciones')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('suscripciones')
 export class SuscripcionesController {

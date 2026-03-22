@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { DevolucionesService } from './devoluciones.service';
 import { CreateDevolucioneDto } from './dto/create-devolucione.dto';
 import { UpdateDevolucioneDto } from './dto/update-devolucione.dto';
 import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@ApiTags('devoluciones')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('devoluciones')
 export class DevolucionesController {

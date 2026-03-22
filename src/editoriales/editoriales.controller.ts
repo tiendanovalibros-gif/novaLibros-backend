@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { EditorialesService } from './editoriales.service';
 import { CreateEditorialeDto } from './dto/create-editoriale.dto';
 import { UpdateEditorialeDto } from './dto/update-editoriale.dto';
 import { AuthGuard, RolesGuard, Public, Roles } from '../common';
 
+@ApiTags('editoriales')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('editoriales')
 export class EditorialesController {

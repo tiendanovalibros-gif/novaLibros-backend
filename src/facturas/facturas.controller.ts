@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { FacturasService } from './facturas.service';
 import { CreateFacturaDto } from './dto/create-factura.dto';
 import { UpdateFacturaDto } from './dto/update-factura.dto';
 import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@ApiTags('facturas')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('facturas')
 export class FacturasController {

@@ -16,6 +16,7 @@ async function bootstrap() {
     .setTitle('NovaLibros API')
     .setDescription('API para la gestión de NovaLibros')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

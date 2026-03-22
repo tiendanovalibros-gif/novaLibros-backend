@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ReservasService } from './reservas.service';
 import { CreateReservaDto } from './dto/create-reserva.dto';
 import { UpdateReservaDto } from './dto/update-reserva.dto';
 import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@ApiTags('reservas')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('reservas')
 export class ReservasController {

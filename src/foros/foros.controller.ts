@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ForosService } from './foros.service';
 import { CreateForoDto } from './dto/create-foro.dto';
 import { UpdateForoDto } from './dto/update-foro.dto';
 import { AuthGuard, RolesGuard, Public, Roles } from '../common';
 
+@ApiTags('foros')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('foros')
 export class ForosController {

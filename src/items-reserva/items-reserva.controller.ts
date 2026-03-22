@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ItemsReservaService } from './items-reserva.service';
 import { CreateItemsReservaDto } from './dto/create-items-reserva.dto';
 import { UpdateItemsReservaDto } from './dto/update-items-reserva.dto';
 import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@ApiTags('items-reserva')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('items-reserva')
 export class ItemsReservaController {
