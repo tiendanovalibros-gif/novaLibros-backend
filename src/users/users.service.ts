@@ -1,14 +1,21 @@
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { hashPassword, comparePassword, signToken } from '../utils';
+import { sendEmail } from 'src/emailService';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
+    const { correo, nombre } = createUserDto;
     // Verificar si ya existe un usuario con ese correo
     const existingUser = await this.prisma.usuario.findUnique({
       where: { correo: createUserDto.correo },
@@ -21,13 +28,31 @@ export class UsersService {
     // Hashear la contraseña antes de guardarla
     const hashedPassword = await hashPassword(createUserDto.contrasenaHash);
 
-    return this.prisma.usuario.create({
+    const newUser = await this.prisma.usuario.create({
       data: {
         ...createUserDto,
         fechaNacimiento: new Date(createUserDto.fechaNacimiento),
         contrasenaHash: hashedPassword,
       } as any,
     });
+
+    sendEmail({
+      to: newUser.correo,
+      subject: '¡Bienvenido a NovaLibros! 📚',
+      text: `¡Hola ${newUser.nombre}! Bienvenido a NovaLibros.`,
+      html: `
+      <div style="font-family: Arial; padding: 20px;">
+        <h2>📚 NovaLibros</h2>
+        <p>Hola ${nombre},</p>
+        <p>Tu cuenta fue creada exitosamente.</p>
+        <p>Ya puedes iniciar sesión en la plataforma.</p>
+      </div>
+    `,
+    }).catch((error) => {
+      console.error('Error enviando correo:', error);
+    });
+
+    return newUser;
   }
 
   async login(correo: string, contrasena: string) {
@@ -41,7 +66,10 @@ export class UsersService {
     }
 
     // Verificar contraseña
-    const isPasswordValid = await comparePassword(contrasena, usuario.contrasenaHash);
+    const isPasswordValid = await comparePassword(
+      contrasena,
+      usuario.contrasenaHash,
+    );
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Credenciales inválidas');
@@ -79,7 +107,10 @@ export class UsersService {
   }
 
   update(id: string, updateUserDto: UpdateUserDto) {
-    return this.prisma.usuario.update({ where: { id }, data: updateUserDto as any });
+    return this.prisma.usuario.update({
+      where: { id },
+      data: updateUserDto as any,
+    });
   }
 
   remove(id: string) {

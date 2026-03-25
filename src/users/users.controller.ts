@@ -11,7 +11,13 @@ import {
   UseGuards,
   HttpException,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -19,6 +25,7 @@ import { LoginDto } from './dto/login.dto';
 import { LoginResponseDto, RegisterResponseDto } from './dto/response.dto';
 import { AuthGuard, RolesGuard, Public, Roles, CurrentUser } from '../common';
 import type { JwtPayload } from '../utils';
+import { sendEmail } from 'src/emailService';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -29,9 +36,13 @@ export class UsersController {
 
   @Public()
   @Post('register')
-  @ApiOperation({ summary: 'Registrar un nuevo usuario' })
+  @ApiOperation({ summary: 'Registrar un  nuevo usuario' })
   @ApiBody({ type: CreateUserDto })
-  @ApiResponse({ status: 201, description: 'Usuario creado exitosamente', type: RegisterResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Usuario creado exitosamente',
+    type: RegisterResponseDto,
+  })
   @ApiResponse({ status: 409, description: 'El correo ya está registrado' })
   register(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
@@ -42,7 +53,11 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Iniciar sesión' })
   @ApiBody({ type: LoginDto })
-  @ApiResponse({ status: 200, description: 'Login exitoso, retorna JWT token', type: LoginResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Login exitoso, retorna JWT token',
+    type: LoginResponseDto,
+  })
   @ApiResponse({ status: 401, description: 'Credenciales inválidas' })
   login(@Body() loginDto: LoginDto) {
     return this.usersService.login(loginDto.correo, loginDto.contrasena);
@@ -58,7 +73,9 @@ export class UsersController {
 
   @Roles('root', 'administrador')
   @Get()
-  @ApiOperation({ summary: 'Obtener todos los usuarios (Solo root/administrador)' })
+  @ApiOperation({
+    summary: 'Obtener todos los usuarios (Solo root/administrador)',
+  })
   @ApiResponse({ status: 200, description: 'Lista de usuarios' })
   @ApiResponse({ status: 403, description: 'Sin permisos' })
   findAll() {
@@ -70,8 +87,15 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Usuario encontrado' })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
   findOne(@Param('id') id: string, @CurrentUser() currentUser: JwtPayload) {
-    if (currentUser.rol !== 'root' && currentUser.rol !== 'administrador' && currentUser.sub !== id) {
-      throw new HttpException('No autorizado para ver este usuario', HttpStatus.FORBIDDEN);
+    if (
+      currentUser.rol !== 'root' &&
+      currentUser.rol !== 'administrador' &&
+      currentUser.sub !== id
+    ) {
+      throw new HttpException(
+        'No autorizado para ver este usuario',
+        HttpStatus.FORBIDDEN,
+      );
     }
     return this.usersService.findOne(id);
   }
@@ -79,9 +103,20 @@ export class UsersController {
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar un usuario' })
   @ApiResponse({ status: 200, description: 'Usuario actualizado' })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @CurrentUser() currentUser: JwtPayload) {
-    if (currentUser.rol !== 'root' && currentUser.rol !== 'administrador' && currentUser.sub !== id) {
-      throw new HttpException('No autorizado para actualizar este usuario', HttpStatus.FORBIDDEN);
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @CurrentUser() currentUser: JwtPayload,
+  ) {
+    if (
+      currentUser.rol !== 'root' &&
+      currentUser.rol !== 'administrador' &&
+      currentUser.sub !== id
+    ) {
+      throw new HttpException(
+        'No autorizado para actualizar este usuario',
+        HttpStatus.FORBIDDEN,
+      );
     }
     return this.usersService.update(id, updateUserDto);
   }
