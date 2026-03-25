@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "usuario_dni_key" ON "usuario"("dni");

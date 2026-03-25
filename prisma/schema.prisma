@@ -100,7 +100,7 @@ model Tienda {
 
 model Usuario {
   id               String      @id @default(uuid()) @db.Uuid
-  dni              String
+  dni              String      @unique
   nombre           String
   apellido         String
   fechaNacimiento  DateTime    @map("fecha_nacimiento") @db.Date
