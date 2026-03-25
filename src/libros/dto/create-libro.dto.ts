@@ -25,12 +25,22 @@ export class CreateLibroDto {
   @ApiProperty({ description: 'Idioma del libro', example: 'Español' })
   idioma: string;
 
-  @ApiPropertyOptional({ description: 'Descripción del libro', example: 'Una novela de aventuras y sátira' })
+  @ApiPropertyOptional({
+    description: 'Descripción del libro',
+    example: 'Una novela de aventuras y sátira',
+  })
   descripcion?: string;
 
-  @ApiPropertyOptional({ description: 'URL de la imagen de portada', example: 'https://example.com/portada.jpg' })
+  @ApiPropertyOptional({
+    description: 'URL de la imagen de portada',
+    example: 'https://example.com/portada.jpg',
+  })
   imagenPortada?: string;
 
-  @ApiProperty({ description: 'Estado del libro', example: 'disponible' })
+  @ApiProperty({
+    description: 'Estado del libro',
+    example: 'nuevo',
+    enum: ['nuevo', 'usado'],
+  })
   estado: string;
 }
