@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { EstadosPedidoService } from './estados-pedido.service';
 import { CreateEstadosPedidoDto } from './dto/create-estados-pedido.dto';
 import { UpdateEstadosPedidoDto } from './dto/update-estados-pedido.dto';
 import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@ApiTags('estados-pedido')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('estados-pedido')
 export class EstadosPedidoController {

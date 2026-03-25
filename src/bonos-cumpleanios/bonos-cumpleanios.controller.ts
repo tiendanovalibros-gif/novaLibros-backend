@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { BonosCumpleaniosService } from './bonos-cumpleanios.service';
 import { CreateBonosCumpleanioDto } from './dto/create-bonos-cumpleanio.dto';
 import { UpdateBonosCumpleanioDto } from './dto/update-bonos-cumpleanio.dto';
 import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@ApiTags('bonos-cumpleanios')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('bonos-cumpleanios')
 export class BonosCumpleaniosController {
@@ -21,6 +24,7 @@ export class BonosCumpleaniosController {
     return this.bonosCumpleaniosService.findAll();
   }
 
+  @Roles('administrador')
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.bonosCumpleaniosService.findOne(+id);

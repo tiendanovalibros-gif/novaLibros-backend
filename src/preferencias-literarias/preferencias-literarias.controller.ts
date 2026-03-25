@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { PreferenciasLiterariasService } from './preferencias-literarias.service';
 import { CreatePreferenciasLiterariaDto } from './dto/create-preferencias-literaria.dto';
 import { UpdatePreferenciasLiterariaDto } from './dto/update-preferencias-literaria.dto';
 import { AuthGuard, RolesGuard, Public, Roles } from '../common';
 
+@ApiTags('preferencias-literarias')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('preferencias-literarias')
 export class PreferenciasLiterariasController {

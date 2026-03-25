@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { MovimientosSaldoService } from './movimientos-saldo.service';
 import { CreateMovimientosSaldoDto } from './dto/create-movimientos-saldo.dto';
 import { UpdateMovimientosSaldoDto } from './dto/update-movimientos-saldo.dto';
 import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@ApiTags('movimientos-saldo')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('movimientos-saldo')
 export class MovimientosSaldoController {

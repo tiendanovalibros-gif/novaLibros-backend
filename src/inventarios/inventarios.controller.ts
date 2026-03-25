@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { InventariosService } from './inventarios.service';
 import { CreateInventarioDto } from './dto/create-inventario.dto';
 import { UpdateInventarioDto } from './dto/update-inventario.dto';
 import { AuthGuard, RolesGuard, Public, Roles } from '../common';
 
+@ApiTags('inventarios')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('inventarios')
 export class InventariosController {

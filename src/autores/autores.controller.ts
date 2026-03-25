@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AutoresService } from './autores.service';
 import { CreateAutoreDto } from './dto/create-autore.dto';
 import { UpdateAutoreDto } from './dto/update-autore.dto';
 import { AuthGuard, RolesGuard, Public, Roles } from '../common';
 
+@ApiTags('autores')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('autores')
 export class AutoresController {

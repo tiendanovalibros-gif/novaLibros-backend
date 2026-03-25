@@ -1,9 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UsuariosPreferenciasService } from './usuarios-preferencias.service';
 import { CreateUsuariosPreferenciaDto } from './dto/create-usuarios-preferencia.dto';
 import { UpdateUsuariosPreferenciaDto } from './dto/update-usuarios-preferencia.dto';
 import { AuthGuard, RolesGuard, Roles } from '../common';
 
+@ApiTags('usuarios-preferencias')
+@ApiBearerAuth()
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('usuarios-preferencias')
 export class UsuariosPreferenciasController {
@@ -30,6 +33,7 @@ export class UsuariosPreferenciasController {
     return this.usuariosPreferenciasService.update(+id, updateUsuariosPreferenciaDto);
   }
 
+  @Roles('administrador')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usuariosPreferenciasService.remove(+id);
