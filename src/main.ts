@@ -8,7 +8,10 @@ async function bootstrap() {
 
   // Habilitar CORS para permitir peticiones desde el frontend
   app.enableCors({
-    origin: true, // Permite cualquier origen en desarrollo
+    origin: [
+      'http://localhost:3000',
+      'https://nova-libros-frontend.vercel.app',
+    ],
     credentials: true,
   });
 

@@ -71,7 +71,7 @@ model Genero {
   id     Int    @id @default(autoincrement())
   nombre String
 
-  libros Libro[]
+  libros LibroGenero[]
 
   @@map("genero")
 }
@@ -133,7 +133,6 @@ model Libro {
   id              String      @id @default(uuid()) @db.Uuid
   titulo          String
   idAutor         Int         @map("id_autor")
-  idGenero        Int         @map("id_genero")
   idEditorial     Int         @map("id_editorial")
   anoPublicacion  Int         @map("ano_publicacion")
   precio          Decimal
@@ -144,15 +143,26 @@ model Libro {
   estado          EstadoLibro
 
   autor     Autor     @relation(fields: [idAutor], references: [id])
-  genero    Genero    @relation(fields: [idGenero], references: [id])
   editorial Editorial @relation(fields: [idEditorial], references: [id])
 
+  generos        LibroGenero[]
   inventarios    Inventario[]
   itemsReserva   ItemReserva[]
   detallesCarrito DetalleCarrito[]
   itemsPedido    ItemPedido[]
 
   @@map("libro")
+}
+
+model LibroGenero {
+  idLibro  String @map("id_libro") @db.Uuid
+  idGenero Int    @map("id_genero")
+
+  libro  Libro  @relation(fields: [idLibro], references: [id])
+  genero Genero @relation(fields: [idGenero], references: [id])
+
+  @@id([idLibro, idGenero])
+  @@map("libro_genero")
 }
 
 model Inventario {

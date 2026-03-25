@@ -7,8 +7,8 @@ export class CreateLibroDto {
   @ApiProperty({ description: 'ID del autor', example: 1 })
   idAutor: number;
 
-  @ApiProperty({ description: 'ID del género', example: 1 })
-  idGenero: number;
+  @ApiProperty({ description: 'IDs de géneros del libro', example: [1, 2] })
+  idGeneros: number[];
 
   @ApiProperty({ description: 'ID de la editorial', example: 1 })
   idEditorial: number;

@@ -8,19 +8,74 @@ export class LibrosService {
   constructor(private readonly prisma: PrismaService) {}
 
   create(createLibroDto: CreateLibroDto) {
-    return this.prisma.libro.create({ data: createLibroDto as any });
+    const { idGeneros, ...libroData } = createLibroDto;
+    const uniqueGenreIds = Array.from(new Set(idGeneros));
+
+    return this.prisma.libro.create({
+      data: {
+        ...libroData,
+        generos: {
+          create: uniqueGenreIds.map((idGenero) => ({ idGenero })),
+        },
+      } as any,
+      include: {
+        generos: {
+          include: {
+            genero: true,
+          },
+        },
+      },
+    });
   }
 
   findAll() {
-    return this.prisma.libro.findMany();
+    return this.prisma.libro.findMany({
+      include: {
+        generos: {
+          include: {
+            genero: true,
+          },
+        },
+      },
+    });
   }
 
   findOne(id: string) {
-    return this.prisma.libro.findUnique({ where: { id } });
+    return this.prisma.libro.findUnique({
+      where: { id },
+      include: {
+        generos: {
+          include: {
+            genero: true,
+          },
+        },
+      },
+    });
   }
 
   update(id: string, updateLibroDto: UpdateLibroDto) {
-    return this.prisma.libro.update({ where: { id }, data: updateLibroDto as any });
+    const { idGeneros, ...libroData } = updateLibroDto as any;
+    const data: any = { ...libroData };
+
+    if (Array.isArray(idGeneros)) {
+      const uniqueGenreIds = Array.from(new Set(idGeneros));
+      data.generos = {
+        deleteMany: {},
+        create: uniqueGenreIds.map((idGenero: number) => ({ idGenero })),
+      };
+    }
+
+    return this.prisma.libro.update({
+      where: { id },
+      data,
+      include: {
+        generos: {
+          include: {
+            genero: true,
+          },
+        },
+      },
+    });
   }
 
   remove(id: string) {
