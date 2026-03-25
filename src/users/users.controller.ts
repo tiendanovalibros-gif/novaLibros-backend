@@ -48,6 +48,21 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @Post('register-admin')
+  @Roles('root')
+  @ApiOperation({ summary: 'Registrar un nuevo administrador (Solo root)' })
+  @ApiBody({ type: CreateUserDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Administrador creado exitosamente',
+    type: RegisterResponseDto,
+  })
+  @ApiResponse({ status: 403, description: 'Sin permisos' })
+  @ApiResponse({ status: 409, description: 'El correo ya está registrado' })
+  registerAdmin(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.createAdmin(createUserDto);
+  }
+
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)

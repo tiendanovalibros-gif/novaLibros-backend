@@ -14,7 +14,15 @@ import { sendEmail } from 'src/emailService';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async createAdmin(createUserDto: CreateUserDto) {
+    return this.createWithRole(createUserDto, 'administrador');
+  }
+
   async create(createUserDto: CreateUserDto) {
+    return this.createWithRole(createUserDto, 'cliente');
+  }
+
+  private async createWithRole(createUserDto: CreateUserDto, rol: string) {
     const { correo, nombre } = createUserDto;
     // Verificar si ya existe un usuario con ese correo
     const existingUser = await this.prisma.usuario.findUnique({
@@ -31,6 +39,7 @@ export class UsersService {
     const newUser = await this.prisma.usuario.create({
       data: {
         ...createUserDto,
+        rol,
         fechaNacimiento: new Date(createUserDto.fechaNacimiento),
         contrasenaHash: hashedPassword,
       } as any,
