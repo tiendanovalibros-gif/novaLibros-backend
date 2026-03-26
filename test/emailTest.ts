@@ -1,6 +1,6 @@
 // testEmail.js
 import 'dotenv/config';
-import { sendEmail } from '../src/emailService';
+import { sendEmail } from '../src/email/email.service';
 
 const test = async () => {
   await sendEmail({

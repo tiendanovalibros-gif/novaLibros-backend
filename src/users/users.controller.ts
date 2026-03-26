@@ -25,7 +25,6 @@ import { LoginDto } from './dto/login.dto';
 import { LoginResponseDto, RegisterResponseDto } from './dto/response.dto';
 import { AuthGuard, RolesGuard, Public, Roles, CurrentUser } from '../common';
 import type { JwtPayload } from '../utils';
-import { sendEmail } from 'src/emailService';
 
 @ApiTags('users')
 @ApiBearerAuth()

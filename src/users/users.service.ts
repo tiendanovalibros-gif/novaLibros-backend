@@ -8,11 +8,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { hashPassword, comparePassword, signToken } from '../utils';
-import { sendEmail } from 'src/emailService';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly emailService: EmailService,
+  ) {}
 
   async createAdmin(createUserDto: CreateUserDto) {
     return this.createWithRole(createUserDto, 'administrador');
@@ -45,21 +48,11 @@ export class UsersService {
       } as any,
     });
 
-    sendEmail({
-      to: newUser.correo,
-      subject: '¡Bienvenido a NovaLibros! 📚',
-      text: `¡Hola ${newUser.nombre}! Bienvenido a NovaLibros.`,
-      html: `
-      <div style="font-family: Arial; padding: 20px;">
-        <h2>📚 NovaLibros</h2>
-        <p>Hola ${nombre},</p>
-        <p>Tu cuenta fue creada exitosamente.</p>
-        <p>Ya puedes iniciar sesión en la plataforma.</p>
-      </div>
-    `,
-    }).catch((error) => {
-      console.error('Error enviando correo:', error);
-    });
+    this.emailService
+      .sendWelcomeEmail(newUser.nombre, newUser.correo)
+      .catch((error) => {
+        console.error('Error enviando correo de bienvenida:', error);
+      });
 
     return newUser;
   }
