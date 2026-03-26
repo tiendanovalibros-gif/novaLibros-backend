@@ -64,7 +64,7 @@ export class UsersService {
     });
 
     if (!usuario) {
-      throw new UnauthorizedException('Credenciales inválidas');
+      throw new UnauthorizedException('Usuario no autorizado');
     }
 
     // Verificar contraseña
@@ -74,7 +74,7 @@ export class UsersService {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Credenciales inválidas');
+      throw new UnauthorizedException('Contraseña inválidas');
     }
 
     // Generar token JWT
