@@ -10,6 +10,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:3000',
+      'http://localhost:3001',
       'https://nova-libros-frontend.vercel.app',
     ],
     credentials: true,
