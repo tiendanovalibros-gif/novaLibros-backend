@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { EmailModule } from './email/email.module';
 import { AutoresModule } from './autores/autores.module';
 import { GenerosModule } from './generos/generos.module';
 import { EditorialesModule } from './editoriales/editoriales.module';
@@ -30,7 +31,36 @@ import { PreferenciasLiterariasModule } from './preferencias-literarias/preferen
 import { UsuariosPreferenciasModule } from './usuarios-preferencias/usuarios-preferencias.module';
 
 @Module({
-  imports: [UsersModule, PrismaModule, AutoresModule, GenerosModule, EditorialesModule, TiendasModule, LibrosModule, InventariosModule, ReservasModule, ItemsReservaModule, CarritosModule, DetallesCarritoModule, PedidosModule, EstadosPedidoModule, DevolucionesModule, FacturasModule, SuscripcionesModule, ItemsPedidoModule, ForosModule, MensajesModule, MetodosPagoModule, SaldosUsuarioModule, MovimientosSaldoModule, RegistrosBusquedaModule, BonosCumpleaniosModule, PreferenciasLiterariasModule, UsuariosPreferenciasModule],
+  imports: [
+    UsersModule,
+    PrismaModule,
+    EmailModule,
+    AutoresModule,
+    GenerosModule,
+    EditorialesModule,
+    TiendasModule,
+    LibrosModule,
+    InventariosModule,
+    ReservasModule,
+    ItemsReservaModule,
+    CarritosModule,
+    DetallesCarritoModule,
+    PedidosModule,
+    EstadosPedidoModule,
+    DevolucionesModule,
+    FacturasModule,
+    SuscripcionesModule,
+    ItemsPedidoModule,
+    ForosModule,
+    MensajesModule,
+    MetodosPagoModule,
+    SaldosUsuarioModule,
+    MovimientosSaldoModule,
+    RegistrosBusquedaModule,
+    BonosCumpleaniosModule,
+    PreferenciasLiterariasModule,
+    UsuariosPreferenciasModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

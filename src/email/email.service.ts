@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Resend } from 'resend';
+import * as nodemailer from 'nodemailer';
 import { welcomeTemplate } from './templates/welcome.template';
 
 export interface SendEmailOptions {
@@ -12,28 +12,32 @@ export interface SendEmailOptions {
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
-  private resend: Resend;
+  private transporter: nodemailer.Transporter;
 
   constructor() {
-    this.resend = new Resend(process.env.RESEND_API_KEY);
+    this.transporter = nodemailer.createTransport({
+      host: process.env.MAIL_HOST,
+      port: Number(process.env.MAIL_PORT) || 587,
+      secure: false,
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
+      },
+    });
   }
 
   async sendEmail(options: SendEmailOptions): Promise<void> {
     try {
-      const { data, error } = await this.resend.emails.send({
-        from: 'NovaLibros 📚 <onboarding@resend.dev>',
+      const info = await this.transporter.sendMail({
+        from: `"NovaLibros 📚" <${process.env.MAIL_FROM}>`,
         to: options.to,
         subject: options.subject,
         text: options.text,
         html: options.html,
       });
-
-      if (error) {
-        this.logger.error(`❌ Error al enviar email a ${options.to}`, error);
-        throw new Error(error.message);
-      }
-
-      this.logger.log(`✅ Email enviado a ${options.to} — ID: ${data?.id}`);
+      this.logger.log(
+        `✅ Email enviado a ${options.to} — ID: ${info.messageId}`,
+      );
     } catch (error) {
       this.logger.error(`❌ Error al enviar email a ${options.to}`, error);
       throw error;

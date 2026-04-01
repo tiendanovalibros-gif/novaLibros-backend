@@ -1,25 +1,33 @@
 services:
+  db:
+    image: postgres:15
+    container_name: novalibros-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: novalibros
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   api:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: novalibros-backend
     ports:
-      # Expone el puerto del servidor. La regla es "HOST_PORT:CONTAINER_PORT"
       - "${PORT:-3012}:${PORT:-3012}"
     env_file:
-      # Injecta automáticamente todas las variables del `.env` local
       - .env
     volumes:
-      # Sincroniza el código fuente local con el contenedor para el HOT-RELOAD
       - .:/usr/src/app
-      
-      # Excepciones: Creamos volúmenes anónimos para no sobreescribir dependencias.
-      # Estos directorios vivirán solo dentro del contenedor de Linux y no chocarán 
-      # con tu computadora Windows/Mac/Ubuntu.
       - /usr/src/app/node_modules
-    
-    # Sobrescribimos el 'start:prod' del Dockerfile por 'start:dev' para desarrollo local.
-    # El pre-script de npx asegurará que los Modelos de prisma existan en el volúmen antes de lanzar Nest.
-    command: sh -c "npm install && npx prisma generate && npm run start:dev"
+    depends_on:
+      - db
+    command: sh -c "npx prisma generate && npx prisma migrate deploy && npm run start:dev"
     restart: unless-stopped
+
+volumes:
+  postgres_data:
