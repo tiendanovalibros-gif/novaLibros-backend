@@ -158,7 +158,7 @@ model LibroGenero {
   idLibro  String @map("id_libro") @db.Uuid
   idGenero Int    @map("id_genero")
 
-  libro  Libro  @relation(fields: [idLibro], references: [id])
+  libro  Libro  @relation(fields: [idLibro], references: [id], onDelete: Cascade)
   genero Genero @relation(fields: [idGenero], references: [id])
 
   @@id([idLibro, idGenero])
@@ -173,7 +173,7 @@ model Inventario {
   cantidadBloqueada   Int      @map("cantidad_bloqueada")
   fechaActualizacion  DateTime @map("fecha_actualizacion") @db.Timestamptz()
 
-  libro  Libro  @relation(fields: [idLibro], references: [id])
+  libro  Libro  @relation(fields: [idLibro], references: [id], onDelete: Cascade)
   tienda Tienda @relation(fields: [idTienda], references: [id])
 
   @@map("inventario")
@@ -199,7 +199,7 @@ model ItemReserva {
   cantidad  Int
 
   reserva Reserva @relation(fields: [idReserva], references: [id])
-  libro   Libro   @relation(fields: [idLibro], references: [id])
+  libro   Libro   @relation(fields: [idLibro], references: [id], onDelete: Cascade)
 
   @@map("item_reserva")
 }
@@ -224,7 +224,7 @@ model DetalleCarrito {
   precioUnitario Decimal @map("precio_unitario")
 
   carrito CarritoCompras @relation(fields: [idCarrito], references: [id])
-  libro   Libro          @relation(fields: [idLibro], references: [id])
+  libro   Libro          @relation(fields: [idLibro], references: [id], onDelete: Cascade)
 
   @@map("detalle_carrito")
 }
@@ -258,7 +258,7 @@ model ItemPedido {
   precioUnitario Decimal @map("precio_unitario")
 
   pedido Pedido @relation(fields: [idPedido], references: [id])
-  libro  Libro  @relation(fields: [idLibro], references: [id])
+  libro  Libro  @relation(fields: [idLibro], references: [id], onDelete: Cascade)
 
   @@map("item_pedido")
 }
