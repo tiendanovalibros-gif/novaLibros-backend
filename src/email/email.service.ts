@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import * as nodemailer from 'nodemailer';
+import { MailtrapClient } from 'mailtrap';
 import { welcomeTemplate } from './templates/welcome.template';
 
 export interface SendEmailOptions {
@@ -12,31 +12,28 @@ export interface SendEmailOptions {
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
-  private transporter: nodemailer.Transporter;
+  private client: MailtrapClient;
 
   constructor() {
-    this.transporter = nodemailer.createTransport({
-      host: process.env.MAIL_HOST,
-      port: Number(process.env.MAIL_PORT) || 587,
-      secure: false,
-      auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
-      },
+    this.client = new MailtrapClient({
+      token: process.env.MAILTRAP_API_TOKEN as string,
     });
   }
 
   async sendEmail(options: SendEmailOptions): Promise<void> {
     try {
-      const info = await this.transporter.sendMail({
-        from: `"NovaLibros 📚" <${process.env.MAIL_FROM}>`,
-        to: options.to,
+      const response = await this.client.send({
+        from: {
+          name: 'NovaLibros 📚',
+          email: process.env.MAIL_FROM as string,
+        },
+        to: [{ email: options.to }],
         subject: options.subject,
         text: options.text,
         html: options.html,
       });
       this.logger.log(
-        `✅ Email enviado a ${options.to} — ID: ${info.messageId}`,
+        `✅ Email enviado a ${options.to} — ID: ${response[0]?.message_ids?.[0]}`,
       );
     } catch (error) {
       this.logger.error(`❌ Error al enviar email a ${options.to}`, error);

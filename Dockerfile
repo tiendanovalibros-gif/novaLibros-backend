@@ -9,7 +9,8 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Instalamos las dependencias
-RUN npm install
+
+RUN npm install --legacy-peer-deps
 
 # Copiamos el resto del código
 COPY . .
@@ -25,3 +26,4 @@ EXPOSE 3012
 
 # El comando por defecto cuando el contenedor inicie en producción
 CMD ["npm", "run", "start:prod"]
+
