@@ -176,6 +176,7 @@ model Inventario {
   libro  Libro  @relation(fields: [idLibro], references: [id], onDelete: Cascade)
   tienda Tienda @relation(fields: [idTienda], references: [id])
 
+  @@unique([idLibro, idTienda])
   @@map("inventario")
 }
 
