@@ -7,6 +7,9 @@
   "license": "UNLICENSED",
   "scripts": {
     "postinstall": "prisma generate",
+    "db:seed": "prisma db seed",
+    "db:seed:local": "SEED_DATABASE_URL=postgresql://postgres:postgres@db:5432/novalibros prisma db seed",
+    "seed": "ts-node prisma/seed.ts",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/src/main.js",
@@ -19,6 +22,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.3.4",

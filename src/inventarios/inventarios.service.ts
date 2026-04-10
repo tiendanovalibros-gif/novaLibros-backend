@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateInventarioDto } from './dto/create-inventario.dto';
 import { UpdateInventarioDto } from './dto/update-inventario.dto';
 import { AddLibrosPorGeneroDto } from './dto/add-libros-por-genero.dto';
@@ -19,19 +24,29 @@ export class InventariosService {
     });
 
     if (existingInventario) {
-      throw new ConflictException('Ya existe inventario para ese libro en la tienda indicada');
+      throw new ConflictException(
+        'Ya existe inventario para ese libro en la tienda indicada',
+      );
     }
 
     return this.prisma.inventario.create({ data: createInventarioDto as any });
   }
 
-  async addLibrosPorGenero(idTienda: number, idGenero: number, addLibrosPorGeneroDto: AddLibrosPorGeneroDto) {
+  async addLibrosPorGenero(
+    idTienda: number,
+    idGenero: number,
+    addLibrosPorGeneroDto: AddLibrosPorGeneroDto,
+  ) {
     if (addLibrosPorGeneroDto.cantidadDisponible < 0) {
-      throw new BadRequestException('La cantidad disponible no puede ser negativa');
+      throw new BadRequestException(
+        'La cantidad disponible no puede ser negativa',
+      );
     }
 
     if ((addLibrosPorGeneroDto.cantidadBloqueada ?? 0) < 0) {
-      throw new BadRequestException('La cantidad bloqueada no puede ser negativa');
+      throw new BadRequestException(
+        'La cantidad bloqueada no puede ser negativa',
+      );
     }
 
     const libros = await this.prisma.libro.findMany({
@@ -51,7 +66,8 @@ export class InventariosService {
       throw new NotFoundException('No hay libros para el genero indicado');
     }
 
-    const cantidadBloqueadaInicial = addLibrosPorGeneroDto.cantidadBloqueada ?? 0;
+    const cantidadBloqueadaInicial =
+      addLibrosPorGeneroDto.cantidadBloqueada ?? 0;
 
     return this.prisma.$transaction(async (tx) => {
       let creados = 0;
@@ -126,26 +142,44 @@ export class InventariosService {
   }
 
   update(id: number, updateInventarioDto: UpdateInventarioDto) {
-    return this.prisma.inventario.update({ where: { id }, data: updateInventarioDto as any });
+    return this.prisma.inventario.update({
+      where: { id },
+      data: updateInventarioDto as any,
+    });
   }
 
   remove(id: number) {
     return this.prisma.inventario.delete({ where: { id } });
   }
 
-  async updateCantidadLibro(idTienda: number, idLibro: string, updateCantidadLibroDto: UpdateCantidadLibroDto) {
+  async updateCantidadLibro(
+    idTienda: number,
+    idLibro: string,
+    updateCantidadLibroDto: UpdateCantidadLibroDto,
+  ) {
     if (updateCantidadLibroDto.cantidadDisponible < 0) {
-      throw new BadRequestException('La cantidad disponible no puede ser negativa');
+      throw new BadRequestException(
+        'La cantidad disponible no puede ser negativa',
+      );
     }
 
-    const inventario = await this.getInventarioUnicoPorLibroYTienda(idLibro, idTienda);
+    const inventario = await this.getInventarioUnicoPorLibroYTienda(
+      idLibro,
+      idTienda,
+    );
 
     if (!inventario) {
-      throw new NotFoundException('No existe inventario para ese libro en la tienda indicada');
+      throw new NotFoundException(
+        'No existe inventario para ese libro en la tienda indicada',
+      );
     }
 
-    if (updateCantidadLibroDto.cantidadDisponible < inventario.cantidadBloqueada) {
-      throw new BadRequestException('La cantidad disponible no puede ser menor que la cantidad bloqueada');
+    if (
+      updateCantidadLibroDto.cantidadDisponible < inventario.cantidadBloqueada
+    ) {
+      throw new BadRequestException(
+        'La cantidad disponible no puede ser menor que la cantidad bloqueada',
+      );
     }
 
     return this.prisma.inventario.update({
@@ -160,10 +194,15 @@ export class InventariosService {
   }
 
   async marcarLibroAgotado(idTienda: number, idLibro: string) {
-    const inventario = await this.getInventarioUnicoPorLibroYTienda(idLibro, idTienda);
+    const inventario = await this.getInventarioUnicoPorLibroYTienda(
+      idLibro,
+      idTienda,
+    );
 
     if (!inventario) {
-      throw new NotFoundException('No existe inventario para ese libro en la tienda indicada');
+      throw new NotFoundException(
+        'No existe inventario para ese libro en la tienda indicada',
+      );
     }
 
     return this.prisma.inventario.update({
@@ -177,19 +216,32 @@ export class InventariosService {
     });
   }
 
-  async bloquearLibros(idTienda: number, idLibro: string, bloquearLibrosDto: BloquearLibrosDto) {
+  async bloquearLibros(
+    idTienda: number,
+    idLibro: string,
+    bloquearLibrosDto: BloquearLibrosDto,
+  ) {
     if (bloquearLibrosDto.cantidadABloquear <= 0) {
-      throw new BadRequestException('La cantidad a bloquear debe ser mayor a 0');
+      throw new BadRequestException(
+        'La cantidad a bloquear debe ser mayor a 0',
+      );
     }
 
-    const inventario = await this.getInventarioUnicoPorLibroYTienda(idLibro, idTienda);
+    const inventario = await this.getInventarioUnicoPorLibroYTienda(
+      idLibro,
+      idTienda,
+    );
 
     if (!inventario) {
-      throw new NotFoundException('No existe inventario para ese libro en la tienda indicada');
+      throw new NotFoundException(
+        'No existe inventario para ese libro en la tienda indicada',
+      );
     }
 
     if (inventario.cantidadDisponible < bloquearLibrosDto.cantidadABloquear) {
-      throw new BadRequestException('No hay suficientes libros disponibles para bloquear');
+      throw new BadRequestException(
+        'No hay suficientes libros disponibles para bloquear',
+      );
     }
 
     return this.prisma.inventario.update({
@@ -208,7 +260,10 @@ export class InventariosService {
     });
   }
 
-  private async getInventarioUnicoPorLibroYTienda(idLibro: string, idTienda: number) {
+  private async getInventarioUnicoPorLibroYTienda(
+    idLibro: string,
+    idTienda: number,
+  ) {
     const inventarios = await this.prisma.inventario.findMany({
       where: {
         idLibro,
@@ -220,7 +275,9 @@ export class InventariosService {
     });
 
     if (inventarios.length > 1) {
-      throw new ConflictException('Existen registros duplicados de inventario para ese libro y tienda');
+      throw new ConflictException(
+        'Existen registros duplicados de inventario para ese libro y tienda',
+      );
     }
 
     return inventarios[0] ?? null;

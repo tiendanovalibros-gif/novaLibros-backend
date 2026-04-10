@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { InventariosService } from './inventarios.service';
 import { CreateInventarioDto } from './dto/create-inventario.dto';
@@ -28,7 +37,11 @@ export class InventariosController {
     @Param('idGenero') idGenero: string,
     @Body() addLibrosPorGeneroDto: AddLibrosPorGeneroDto,
   ) {
-    return this.inventariosService.addLibrosPorGenero(+idTienda, +idGenero, addLibrosPorGeneroDto);
+    return this.inventariosService.addLibrosPorGenero(
+      +idTienda,
+      +idGenero,
+      addLibrosPorGeneroDto,
+    );
   }
 
   @Public()
@@ -45,7 +58,10 @@ export class InventariosController {
 
   @Roles('administrador')
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateInventarioDto: UpdateInventarioDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateInventarioDto: UpdateInventarioDto,
+  ) {
     return this.inventariosService.update(+id, updateInventarioDto);
   }
 
@@ -56,12 +72,19 @@ export class InventariosController {
     @Param('idLibro') idLibro: string,
     @Body() updateCantidadLibroDto: UpdateCantidadLibroDto,
   ) {
-    return this.inventariosService.updateCantidadLibro(+idTienda, idLibro, updateCantidadLibroDto);
+    return this.inventariosService.updateCantidadLibro(
+      +idTienda,
+      idLibro,
+      updateCantidadLibroDto,
+    );
   }
 
   @Roles('administrador')
   @Patch('tiendas/:idTienda/libros/:idLibro/agotado')
-  marcarLibroAgotado(@Param('idTienda') idTienda: string, @Param('idLibro') idLibro: string) {
+  marcarLibroAgotado(
+    @Param('idTienda') idTienda: string,
+    @Param('idLibro') idLibro: string,
+  ) {
     return this.inventariosService.marcarLibroAgotado(+idTienda, idLibro);
   }
 
@@ -72,7 +95,11 @@ export class InventariosController {
     @Param('idLibro') idLibro: string,
     @Body() bloquearLibrosDto: BloquearLibrosDto,
   ) {
-    return this.inventariosService.bloquearLibros(+idTienda, idLibro, bloquearLibrosDto);
+    return this.inventariosService.bloquearLibros(
+      +idTienda,
+      idLibro,
+      bloquearLibrosDto,
+    );
   }
 
   @Roles('administrador')

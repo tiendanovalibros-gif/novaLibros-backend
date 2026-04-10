@@ -1,5 +1,6 @@
-# Usamos Node 22 (basado en Alpine que es muy liviano) cumpliendo con los requisitos de Prisma 7 y Nest 11
-FROM node:22-alpine
+# Usamos un mirror publico de Node para evitar timeouts de Docker Hub en algunas redes.
+ARG NODE_BASE_IMAGE=public.ecr.aws/docker/library/node:22-alpine
+FROM ${NODE_BASE_IMAGE}
 
 # Creamos y nos movemos al directorio de la app dentro del contenedor
 WORKDIR /usr/src/app
