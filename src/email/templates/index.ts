@@ -1,2 +1,2 @@
 export { welcomeTemplate } from './welcome.template';
-export { recoverPasswordTemplate } from './recover-password.template';
+export { resetPasswordTemplate } from './reset-password.template';

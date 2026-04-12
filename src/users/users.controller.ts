@@ -25,6 +25,8 @@ import { LoginDto } from './dto/login.dto';
 import { LoginResponseDto, RegisterResponseDto } from './dto/response.dto';
 import { AuthGuard, RolesGuard, Public, Roles, CurrentUser } from '../common';
 import type { JwtPayload } from '../utils';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -75,6 +77,37 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Credenciales inválidas' })
   login(@Body() loginDto: LoginDto) {
     return this.usersService.login(loginDto.correo, loginDto.contrasena);
+  }
+
+  @Public()
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Solicitar restablecimiento de contraseña' })
+  @ApiBody({ type: ForgotPasswordDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Correo enviado si el usuario existe',
+  })
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    await this.usersService.forgotPassword(dto.correo);
+    return {
+      message: 'Si el correo existe, recibirás un enlace de recuperación',
+    };
+  }
+
+  @Public()
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Restablecer contraseña con token' })
+  @ApiBody({ type: ResetPasswordDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Contraseña actualizada exitosamente',
+  })
+  @ApiResponse({ status: 401, description: 'Token inválido o expirado' })
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    await this.usersService.resetPassword(dto.token, dto.nuevaContrasena);
+    return { message: 'Contraseña actualizada exitosamente' };
   }
 
   @Get('profile')

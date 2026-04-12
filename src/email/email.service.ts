@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MailtrapClient } from 'mailtrap';
 import { welcomeTemplate } from './templates/welcome.template';
+import { resetPasswordTemplate } from './templates/reset-password.template';
 
 export interface SendEmailOptions {
   to: string;
@@ -47,6 +48,19 @@ export class EmailService {
       subject: '¡Bienvenido a NovaLibros! 📚',
       html: welcomeTemplate(nombre),
       text: `¡Hola ${nombre}! Bienvenido a NovaLibros. Tu cuenta fue creada exitosamente.`,
+    });
+  }
+
+  async sendResetPasswordEmail(
+    nombre: string,
+    correo: string,
+    resetLink: string,
+  ): Promise<void> {
+    await this.sendEmail({
+      to: correo,
+      subject: 'Recuperar Contraseña - NovaLibros 🔐',
+      html: resetPasswordTemplate(nombre, resetLink),
+      text: `Hola ${nombre}, recibimos una solicitud para restablecer tu contraseña. Usa este enlace para crear una nueva: ${resetLink}`,
     });
   }
 }

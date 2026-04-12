@@ -1,4 +1,4 @@
-export const recoverPasswordTemplate = (
+export const resetPasswordTemplate = (
   nombre: string,
   resetLink: string,
 ): string => `

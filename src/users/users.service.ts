@@ -4,6 +4,7 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -117,5 +118,65 @@ export class UsersService {
 
   remove(id: string) {
     return this.prisma.usuario.delete({ where: { id } });
+  }
+
+  async forgotPassword(correo: string): Promise<void> {
+    const usuario = await this.prisma.usuario.findUnique({ where: { correo } });
+
+    if (!usuario) return;
+
+    await this.prisma.passwordResetToken.deleteMany({
+      where: { idUsuario: usuario.id },
+    });
+
+    const token = randomUUID();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+    await this.prisma.passwordResetToken.create({
+      data: {
+        idUsuario: usuario.id,
+        token,
+        expiresAt,
+      },
+    });
+
+    const resetUrl = `${process.env.FRONTEND_URL}/recover-password/reset-password?token=${token}`;
+
+    await this.emailService
+      .sendResetPasswordEmail(usuario.nombre, usuario.correo, resetUrl)
+      .catch((error) => {
+        console.error('Error enviando correo de recuperación:', error);
+      });
+  }
+
+  async resetPassword(token: string, nuevaContrasena: string): Promise<void> {
+    const resetToken = await this.prisma.passwordResetToken.findUnique({
+      where: { token },
+      include: { usuario: true },
+    });
+
+    if (!resetToken) {
+      throw new NotFoundException('Token inválido');
+    }
+
+    if (resetToken.used) {
+      throw new UnauthorizedException('Este token ya fue utilizado');
+    }
+
+    if (new Date() > resetToken.expiresAt) {
+      throw new UnauthorizedException('El token ha expirado');
+    }
+
+    const hashedPassword = await hashPassword(nuevaContrasena);
+
+    await this.prisma.usuario.update({
+      where: { id: resetToken.idUsuario },
+      data: { contrasenaHash: hashedPassword },
+    });
+
+    await this.prisma.passwordResetToken.update({
+      where: { token },
+      data: { used: true },
+    });
   }
 }
