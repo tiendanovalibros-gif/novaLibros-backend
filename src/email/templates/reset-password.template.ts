@@ -7,116 +7,112 @@ export const resetPasswordTemplate = (
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Recuperar contraseña - NovaLibros</title>
+  <title>Restablecer contrasena - NovaLibros</title>
 </head>
-<body style="margin:0; padding:0; background-color:#f4f1eb; font-family: Georgia, 'Times New Roman', serif;">
-
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f1eb; padding: 40px 0;">
+<body style="margin:0; padding:0; background-color:#f8fafc; font-family: 'DM Sans', 'Manrope', 'Avenir Next', sans-serif; color:#0f172a;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8fafc; padding: 32px 12px;">
     <tr>
       <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
-
-          <!-- Header -->
+        <table width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:600px; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e2e8f0; box-shadow: 0 16px 40px rgba(15,23,42,0.08);">
           <tr>
-            <td style="background-color:#1a1a2e; padding: 40px 48px; text-align:center;">
-              <p style="margin:0; font-size:13px; color:#a89060; letter-spacing:3px; text-transform:uppercase; font-family: Arial, sans-serif;">Librería Digital</p>
-              <h1 style="margin:8px 0 0 0; font-size:36px; color:#ffffff; letter-spacing:1px;">NovaLibros</h1>
-              <p style="margin:6px 0 0 0; font-size:14px; color:#a89060;">🔐</p>
+            <td style="background-color:#0f172a; padding: 24px 32px;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="left">
+                    <table cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="background-color:#2563eb; border-radius:12px; width:40px; height:40px; text-align:center;">
+                          <span style="display:inline-block; font-size:20px; color:#ffffff; font-weight:700; line-height:40px;">N</span>
+                        </td>
+                        <td style="padding-left:12px;">
+                          <div style="font-size:18px; font-weight:700; color:#ffffff; letter-spacing:-0.3px;">NovaLibros</div>
+                          <div style="font-size:11px; color:#94a3b8; letter-spacing:2px; text-transform:uppercase;">Tu libreria en linea</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td align="right" style="color:#93c5fd; font-size:18px;">🔐</td>
+                </tr>
+              </table>
             </td>
           </tr>
 
-          <!-- Body -->
           <tr>
-            <td style="padding: 48px 48px 32px 48px;">
-              <h2 style="margin:0 0 16px 0; font-size:24px; color:#1a1a2e;">Hola, ${nombre}</h2>
-              <p style="margin:0 0 20px 0; font-size:16px; color:#444; line-height:1.7;">
-                Recibimos una solicitud para restablecer la contraseña de tu cuenta en <strong>NovaLibros</strong>.
+            <td style="padding: 32px 32px 24px 32px;">
+              <div style="display:inline-block; background-color:#eff6ff; color:#1d4ed8; border-radius:999px; padding:4px 12px; font-size:11px; font-weight:700; letter-spacing:0.6px; text-transform:uppercase;">
+                Recuperacion
+              </div>
+              <h1 style="margin:12px 0 12px 0; font-size:24px; line-height:1.3; color:#0f172a;">Restablece tu contrasena</h1>
+              <p style="margin:0 0 18px 0; font-size:15px; color:#475569; line-height:1.7;">
+                Hola, <strong style="color:#0f172a;">${nombre}</strong>. Recibimos una solicitud para restablecer la contrasena de tu cuenta en <strong>NovaLibros</strong>.
               </p>
-              <p style="margin:0 0 32px 0; font-size:16px; color:#444; line-height:1.7;">
-                Si fuiste tú quien solicitó el cambio, haz clic en el botón de abajo para crear una nueva contraseña:
+              <p style="margin:0 0 24px 0; font-size:15px; color:#475569; line-height:1.7;">
+                Si fuiste tu quien solicito el cambio, usa el boton para crear una nueva contrasena.
               </p>
 
-              <!-- CTA Button -->
-              <table cellpadding="0" cellspacing="0" style="margin: 0 0 32px 0;">
+              <table cellpadding="0" cellspacing="0" style="margin: 0 0 24px 0;">
                 <tr>
-                  <td style="background-color:#a89060; border-radius:8px;">
-                    <a href="${resetLink}"
-                       style="display:inline-block; padding:16px 40px; font-size:16px; color:#ffffff; text-decoration:none; font-family: Arial, sans-serif; letter-spacing:0.5px; font-weight:bold;">
-                      Restablecer contraseña
+                  <td style="background-color:#2563eb; border-radius:10px;">
+                    <a href="${resetLink}" style="display:inline-block; padding:14px 32px; font-size:15px; color:#ffffff; text-decoration:none; font-weight:600;">
+                      Restablecer contrasena
                     </a>
                   </td>
                 </tr>
               </table>
 
-              <!-- Alternative link -->
-              <p style="margin:0 0 24px 0; font-size:14px; color:#777; line-height:1.6; font-family: Arial, sans-serif;">
-                Si el botón no funciona, copia y pega este enlace en tu navegador:
+              <p style="margin:0 0 12px 0; font-size:13px; color:#64748b; line-height:1.6;">
+                Si el boton no funciona, copia y pega este enlace en tu navegador:
               </p>
-              <p style="margin:0 0 32px 0; font-size:13px; color:#0066cc; word-break:break-all; font-family: 'Courier New', monospace; background-color:#f5f5f5; padding:12px; border-radius:6px; border:1px solid #e0e0e0;">
+              <p style="margin:0 0 24px 0; font-size:12px; color:#1d4ed8; word-break:break-all; font-family: 'Courier New', monospace; background-color:#f1f5f9; padding:12px; border-radius:10px; border:1px solid #e2e8f0;">
                 ${resetLink}
               </p>
 
-              <!-- Important Info -->
-              <div style="background-color:#fff8e1; border-left:4px solid #ffc107; padding:16px 20px; margin: 0 0 24px 0; border-radius:4px;">
-                <p style="margin:0 0 8px 0; font-size:14px; color:#856404; font-weight:bold; font-family: Arial, sans-serif;">
-                  ⚠️ Información importante
-                </p>
-                <p style="margin:0; font-size:13px; color:#856404; line-height:1.6; font-family: Arial, sans-serif;">
-                  Este enlace expirará en <strong>15 minutos</strong> por razones de seguridad.
+              <div style="background-color:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px; margin: 0 0 16px 0;">
+                <p style="margin:0 0 8px 0; font-size:13px; color:#0f172a; font-weight:700;">Tiempo limitado</p>
+                <p style="margin:0; font-size:13px; color:#475569; line-height:1.6;">
+                  Este enlace expira en <strong>15 minutos</strong> por seguridad.
                 </p>
               </div>
 
-              <!-- Security Warning -->
-              <div style="background-color:#f8f9fa; border-radius:6px; padding:16px 20px;">
-                <p style="margin:0 0 12px 0; font-size:14px; color:#495057; font-family: Arial, sans-serif;">
-                  <strong>🛡️ Seguridad de tu cuenta</strong>
-                </p>
-                <p style="margin:0; font-size:13px; color:#6c757d; line-height:1.6; font-family: Arial, sans-serif;">
-                  Si <strong>no solicitaste</strong> este cambio de contraseña, ignora este correo y tu contraseña permanecerá sin cambios.
-                  Te recomendamos cambiar tu contraseña si crees que alguien más tiene acceso a tu cuenta.
+              <div style="background-color:#fefce8; border:1px solid #fde68a; border-radius:12px; padding:14px 16px;">
+                <p style="margin:0 0 8px 0; font-size:13px; color:#92400e; font-weight:700;">Seguridad de tu cuenta</p>
+                <p style="margin:0; font-size:13px; color:#92400e; line-height:1.6;">
+                  Si no solicitaste este cambio, ignora este correo. Te recomendamos actualizar tu contrasena si crees que alguien mas tiene acceso a tu cuenta.
                 </p>
               </div>
             </td>
           </tr>
 
-          <!-- Divider -->
           <tr>
-            <td style="padding: 0 48px;">
-              <hr style="border:none; border-top:1px solid #e8e0d0; margin: 0;" />
+            <td style="padding: 0 32px;">
+              <hr style="border:none; border-top:1px solid #e2e8f0; margin: 0;" />
             </td>
           </tr>
 
-          <!-- Help Section -->
           <tr>
-            <td style="padding: 32px 48px 40px 48px; text-align:center;">
-              <p style="margin:0 0 12px 0; font-size:14px; color:#777; font-family: Arial, sans-serif;">
-                ¿Necesitas ayuda?
-              </p>
-              <p style="margin:0; font-size:13px; color:#777; line-height:1.6; font-family: Arial, sans-serif;">
-                Contáctanos en
-                <a href="mailto:soporte@novalibros.com" style="color:#a89060; text-decoration:none;">soporte@novalibros.com</a>
+            <td style="padding: 24px 32px 28px 32px; text-align:center;">
+              <p style="margin:0 0 8px 0; font-size:13px; color:#64748b;">Necesitas ayuda?</p>
+              <p style="margin:0; font-size:13px; color:#64748b; line-height:1.6;">
+                Contactanos en
+                <a href="mailto:soporte@novalibros.com" style="color:#2563eb; text-decoration:none;">soporte@novalibros.com</a>
               </p>
             </td>
           </tr>
 
-          <!-- Footer -->
           <tr>
-            <td style="background-color:#f9f6f0; padding: 24px 48px; text-align:center; border-top:1px solid #e8e0d0;">
-              <p style="margin:0 0 8px 0; font-size:12px; color:#aaa; font-family:Arial,sans-serif; line-height:1.6;">
-                Este es un correo automático de NovaLibros.<br/>
-                Por favor, no respondas a este mensaje.
+            <td style="background-color:#f8fafc; padding: 18px 32px; text-align:center; border-top:1px solid #e2e8f0;">
+              <p style="margin:0 0 6px 0; font-size:11px; color:#94a3b8; line-height:1.6;">
+                Este es un correo automatico de NovaLibros. Por favor, no respondas a este mensaje.
               </p>
-              <p style="margin:0; font-size:11px; color:#ccc; font-family:Arial,sans-serif;">
+              <p style="margin:0; font-size:11px; color:#cbd5e1;">
                 © ${new Date().getFullYear()} NovaLibros. Todos los derechos reservados.
               </p>
             </td>
           </tr>
-
         </table>
       </td>
     </tr>
   </table>
-
 </body>
 </html>
 `;
