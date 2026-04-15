@@ -109,8 +109,21 @@ export class UsersService {
     return usuario;
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return this.prisma.usuario.update({
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    const usuario = await this.prisma.usuario.findUnique({ where: { id } });
+    if (!usuario) {
+      throw new NotFoundException(`Usuario con id ${id} no encontrado`);
+    }
+    if (updateUserDto.correo && updateUserDto.correo !== usuario.correo) {
+      const existingUser = await this.prisma.usuario.findUnique({
+        where: { correo: updateUserDto.correo },
+      });
+      if (existingUser) {
+        throw new ConflictException('Ya existe un usuario con ese correo');
+      }
+    }
+
+    return await this.prisma.usuario.update({
       where: { id },
       data: updateUserDto as any,
     });
