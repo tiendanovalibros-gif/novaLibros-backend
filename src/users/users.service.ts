@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   ConflictException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -190,6 +191,51 @@ export class UsersService {
     await this.prisma.passwordResetToken.update({
       where: { token },
       data: { used: true },
+    });
+  }
+
+  async changePassword(
+    userId: string,
+    contrasenaActual: string,
+    nuevaContrasena: string,
+  ): Promise<void> {
+    const usuario = await this.prisma.usuario.findUnique({
+      where: { id: userId },
+    });
+
+    if (!usuario) {
+      throw new NotFoundException(`Usuario con id ${userId} no encontrado`);
+    }
+
+    if (!contrasenaActual?.trim() || !nuevaContrasena?.trim()) {
+      throw new BadRequestException('Contrasena requerida');
+    }
+
+    const isPasswordValid = await comparePassword(
+      contrasenaActual,
+      usuario.contrasenaHash,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Contrasena actual invalida');
+    }
+
+    const isSamePassword = await comparePassword(
+      nuevaContrasena,
+      usuario.contrasenaHash,
+    );
+
+    if (isSamePassword) {
+      throw new BadRequestException(
+        'La nueva contrasena debe ser diferente a la actual',
+      );
+    }
+
+    const hashedPassword = await hashPassword(nuevaContrasena);
+
+    await this.prisma.usuario.update({
+      where: { id: userId },
+      data: { contrasenaHash: hashedPassword },
     });
   }
 }
