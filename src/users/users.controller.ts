@@ -27,6 +27,7 @@ import { AuthGuard, RolesGuard, Public, Roles, CurrentUser } from '../common';
 import type { JwtPayload } from '../utils';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -107,6 +108,26 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Token inválido o expirado' })
   async resetPassword(@Body() dto: ResetPasswordDto) {
     await this.usersService.resetPassword(dto.token, dto.nuevaContrasena);
+    return { message: 'Contraseña actualizada exitosamente' };
+  }
+
+  @Patch('change-password')
+  @ApiOperation({ summary: 'Cambiar contraseña del usuario autenticado' })
+  @ApiBody({ type: ChangePasswordDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Contraseña actualizada exitosamente',
+  })
+  @ApiResponse({ status: 401, description: 'Contraseña actual inválida' })
+  async changePassword(
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    await this.usersService.changePassword(
+      user.sub,
+      dto.contrasenaActual,
+      dto.nuevaContrasena,
+    );
     return { message: 'Contraseña actualizada exitosamente' };
   }
 
