@@ -54,20 +54,50 @@ async function seedEditoriales() {
   }
 }
 
+async function seedCiudades() {
+  for (const nombre of ['Bogotá', 'Pereira', 'Medellín']) {
+    await prisma.ciudad.upsert({
+      where: { nombre },
+      update: {},
+      create: { nombre },
+    });
+  }
+}
+
 async function seedTiendas() {
+  const ciudad = await prisma.ciudad.findUnique({
+    where: { nombre: 'Bogotá' },
+  });
+
+  if (!ciudad) {
+    throw new Error('No se encontró ciudad para sembrar tienda');
+  }
+
   const tienda = await prisma.tienda.findFirst({
     where: { nombre: 'Tienda Centro' },
   });
+
   if (!tienda) {
     await prisma.tienda.create({
       data: {
         nombre: 'Tienda Centro',
-        direccion: 'Av. Principal 123',
+        direccion: 'Calle 100 # 7-45',
+        direccionNormalizada: 'Calle 100 # 7-45, Bogotá, Colombia',
         latitud: '4.7110',
         longitud: '-74.0721',
+        idCiudad: ciudad.id,
       },
     });
+    return;
   }
+
+  await prisma.tienda.update({
+    where: { id: tienda.id },
+    data: {
+      direccionNormalizada: tienda.direccionNormalizada ?? tienda.direccion,
+      idCiudad: tienda.idCiudad ?? ciudad.id,
+    },
+  });
 }
 
 async function seedUsuarios() {
@@ -776,6 +806,7 @@ async function main() {
   await seedAutores();
   await seedGeneros();
   await seedEditoriales();
+  await seedCiudades();
   await seedTiendas();
   await seedUsuarios();
   await seedLibros();

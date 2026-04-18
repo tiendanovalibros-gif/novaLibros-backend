@@ -85,15 +85,30 @@ model Editorial {
   @@map("editorial")
 }
 
+model Ciudad {
+  id     Int    @id @default(autoincrement())
+  nombre String @unique
+
+  tiendas Tienda[]
+
+  @@map("ciudad")
+}
+
 model Tienda {
-  id        Int      @id @default(autoincrement())
-  nombre    String
-  direccion String
-  latitud   Decimal
-  longitud  Decimal
+  id                  Int      @id @default(autoincrement())
+  nombre              String
+  direccion           String
+  direccionNormalizada String? @map("direccion_normalizada")
+  latitud             Decimal
+  longitud            Decimal
+  idCiudad            Int?     @map("id_ciudad")
+
+  ciudad Ciudad? @relation(fields: [idCiudad], references: [id])
 
   inventarios Inventario[]
   pedidos     Pedido[]
+
+  @@index([idCiudad])
 
   @@map("tienda")
 }

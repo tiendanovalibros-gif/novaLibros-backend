@@ -2,8 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
   IsNotEmpty,
-  Matches,
   IsString,
+  Matches,
   MaxLength,
   MinLength,
 } from 'class-validator';
@@ -12,17 +12,9 @@ import {
   DIRECCION_COLOMBIA_REGEX,
 } from './direccion-format.constants';
 
-export class CreateTiendaDto {
-  @ApiProperty({ description: 'Nombre de la tienda', example: 'Tienda Centro' })
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  @IsString({ message: 'El nombre debe ser un texto' })
-  @IsNotEmpty({ message: 'El nombre es obligatorio' })
-  @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })
-  @MaxLength(120, { message: 'El nombre no puede superar los 120 caracteres' })
-  nombre: string;
-
+export class ValidateTiendaDireccionDto {
   @ApiProperty({
-    description: 'Dirección de la tienda',
+    description: 'Dirección que se desea validar dentro de una ciudad',
     example: 'Calle 100 # 7-45',
   })
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
