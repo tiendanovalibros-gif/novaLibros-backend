@@ -54,7 +54,9 @@ export class InventariosService {
 
         const ultimaActualizacion = libro.inventarios.reduce<Date>(
           (maxFecha, inv) =>
-            inv.fechaActualizacion > maxFecha ? inv.fechaActualizacion : maxFecha,
+            inv.fechaActualizacion > maxFecha
+              ? inv.fechaActualizacion
+              : maxFecha,
           new Date(0),
         );
 

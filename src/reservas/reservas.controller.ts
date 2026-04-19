@@ -1,9 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ReservasService } from './reservas.service';
 import { CreateReservaDto } from './dto/create-reserva.dto';
 import { UpdateReservaDto } from './dto/update-reserva.dto';
-import { AuthGuard, RolesGuard, Roles } from '../common';
+import { AuthGuard, RolesGuard, Roles, CurrentUser } from '../common';
+import type { JwtPayload } from '../utils';
 
 @ApiTags('reservas')
 @ApiBearerAuth()
@@ -12,20 +22,29 @@ import { AuthGuard, RolesGuard, Roles } from '../common';
 export class ReservasController {
   constructor(private readonly reservasService: ReservasService) {}
 
+  @Roles('cliente')
   @Post()
-  create(@Body() createReservaDto: CreateReservaDto) {
-    return this.reservasService.create(createReservaDto);
+  create(
+    @Body() createReservaDto: CreateReservaDto,
+    @CurrentUser() currentUser: JwtPayload,
+  ) {
+    return this.reservasService.create(createReservaDto, currentUser);
   }
 
-  @Roles('administrador')
+  @Roles('administrador', 'root')
   @Get()
   findAll() {
     return this.reservasService.findAll();
   }
 
+  @Get('me')
+  findMine(@CurrentUser() currentUser: JwtPayload) {
+    return this.reservasService.findMine(currentUser);
+  }
+
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reservasService.findOne(id);
+  findOne(@Param('id') id: string, @CurrentUser() currentUser: JwtPayload) {
+    return this.reservasService.findOne(id, currentUser);
   }
 
   @Patch(':id')
@@ -33,7 +52,12 @@ export class ReservasController {
     return this.reservasService.update(id, updateReservaDto);
   }
 
-  @Roles('administrador')
+  @Patch(':id/cancel')
+  cancel(@Param('id') id: string, @CurrentUser() currentUser: JwtPayload) {
+    return this.reservasService.cancel(id, currentUser);
+  }
+
+  @Roles('administrador', 'root')
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.reservasService.remove(id);

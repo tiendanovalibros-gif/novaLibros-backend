@@ -167,23 +167,17 @@ export class TiendasController {
     return this.tiendasService.create(createTiendaDto);
   }
 
-  @Roles('administrador')
+  @Public()
   @Get()
   @ApiOperation({
-    summary: 'Listar tiendas (solo administrador)',
+    summary: 'Listar tiendas (público)',
     description:
-      'Retorna todas las tiendas registradas ordenadas por id ascendente. Requiere rol administrador.',
+      'Retorna todas las tiendas registradas ordenadas por id ascendente. No requiere autenticación.',
   })
   @ApiOkResponse({
     description: 'Listado de tiendas',
     type: Tienda,
     isArray: true,
-  })
-  @ApiUnauthorizedResponse({
-    description: 'No se envió token o el token no es válido',
-  })
-  @ApiForbiddenResponse({
-    description: 'El usuario autenticado no tiene rol administrador',
   })
   findAll() {
     return this.tiendasService.findAll();
