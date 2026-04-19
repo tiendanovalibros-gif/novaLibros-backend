@@ -57,6 +57,15 @@ export class ReservasController {
     return this.reservasService.cancel(id, currentUser);
   }
 
+  @Roles('cliente')
+  @Patch(':id/convert-to-cart')
+  convertToCart(
+    @Param('id') id: string,
+    @CurrentUser() currentUser: JwtPayload,
+  ) {
+    return this.reservasService.convertToCart(id, currentUser);
+  }
+
   @Roles('administrador', 'root')
   @Delete(':id')
   remove(@Param('id') id: string) {

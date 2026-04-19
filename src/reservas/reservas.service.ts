@@ -312,6 +312,126 @@ export class ReservasService {
     });
   }
 
+  async convertToCart(id: string, currentUser: JwtPayload) {
+    if (currentUser.rol !== 'cliente') {
+      throw new ForbiddenException(
+        'Solo los clientes pueden convertir reservas a compra',
+      );
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      await this.expirarReservasYLiberarInventario(tx);
+
+      const reserva = await tx.reserva.findUnique({
+        where: { id },
+        include: {
+          itemsReserva: true,
+        },
+      });
+
+      if (!reserva) {
+        throw new NotFoundException('Reserva no encontrada');
+      }
+
+      if (reserva.idUsuario !== currentUser.sub) {
+        throw new ForbiddenException(
+          'No autorizado para convertir esta reserva',
+        );
+      }
+
+      if (reserva.estado !== 'activa') {
+        throw new BadRequestException('Solo puedes convertir reservas activas');
+      }
+
+      if (reserva.horaExpiracion <= new Date()) {
+        throw new BadRequestException('La reserva ya expiró');
+      }
+
+      const carrito = await this.getOrCreateMine(currentUser.sub, tx);
+
+      for (const item of reserva.itemsReserva) {
+        const libro = await tx.libro.findUnique({
+          where: { id: item.idLibro },
+          select: { precio: true },
+        });
+
+        if (!libro) {
+          throw new NotFoundException(
+            'El libro asociado a la reserva no existe',
+          );
+        }
+
+        const detalleExistente = await tx.detalleCarrito.findFirst({
+          where: {
+            idCarrito: carrito.id,
+            idLibro: item.idLibro,
+          },
+        });
+
+        const cantidadActualEnCarrito = detalleExistente?.cantidad ?? 0;
+        const cantidadFaltante = Math.max(
+          0,
+          item.cantidad - cantidadActualEnCarrito,
+        );
+
+        if (cantidadFaltante <= 0) {
+          continue;
+        }
+
+        if (detalleExistente) {
+          await tx.detalleCarrito.update({
+            where: { id: detalleExistente.id },
+            data: {
+              cantidad: {
+                increment: cantidadFaltante,
+              },
+              precioUnitario: libro.precio,
+            },
+          });
+        } else {
+          await tx.detalleCarrito.create({
+            data: {
+              idCarrito: carrito.id,
+              idLibro: item.idLibro,
+              cantidad: cantidadFaltante,
+              precioUnitario: libro.precio,
+            },
+          });
+        }
+      }
+
+      await tx.carritoCompras.update({
+        where: { id: carrito.id },
+        data: {
+          fechaActualizacion: new Date(),
+        },
+      });
+
+      return tx.carritoCompras.findUnique({
+        where: { id: carrito.id },
+        include: {
+          detalles: {
+            include: {
+              libro: {
+                select: {
+                  id: true,
+                  titulo: true,
+                  imagenPortada: true,
+                  isbn: true,
+                  precio: true,
+                  estado: true,
+                },
+              },
+            },
+            orderBy: {
+              id: 'desc',
+            },
+          },
+        },
+      });
+    });
+  }
+
   async remove(id: string) {
     return this.prisma.reserva.delete({ where: { id } });
   }
@@ -396,5 +516,27 @@ export class ReservasService {
         cantidadPendienteLiberar -= cantidadALiberar;
       }
     }
+  }
+
+  private async getOrCreateMine(idUsuario: string, tx: PrismaService | any) {
+    const carritoExistente = await tx.carritoCompras.findFirst({
+      where: { idUsuario },
+      orderBy: {
+        id: 'asc',
+      },
+    });
+
+    if (carritoExistente) {
+      return carritoExistente;
+    }
+
+    const ahora = new Date();
+    return tx.carritoCompras.create({
+      data: {
+        idUsuario,
+        fechaCreacion: ahora,
+        fechaActualizacion: ahora,
+      },
+    });
   }
 }
