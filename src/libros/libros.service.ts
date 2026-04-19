@@ -7,6 +7,68 @@ import { PrismaService } from '../prisma/prisma.service';
 export class LibrosService {
   constructor(private readonly prisma: PrismaService) {}
 
+  search(params: {
+    q?: string;
+    idAutor?: number;
+    generoIds?: number[];
+    anoMin?: number;
+    anoMax?: number;
+  }) {
+    const andFilters: any[] = [];
+
+    if (params.q) {
+      const terms = params.q.split(/\s+/).filter((term) => term.length > 0);
+      for (const term of terms) {
+        andFilters.push({
+          OR: [
+            { titulo: { contains: term, mode: 'insensitive' } },
+            { descripcion: { contains: term, mode: 'insensitive' } },
+            { isbn: { contains: term, mode: 'insensitive' } },
+            { autor: { nombre: { contains: term, mode: 'insensitive' } } },
+            { editorial: { nombre: { contains: term, mode: 'insensitive' } } },
+            {
+              generos: {
+                some: {
+                  genero: { nombre: { contains: term, mode: 'insensitive' } },
+                },
+              },
+            },
+          ],
+        });
+      }
+    }
+
+    if (params.idAutor !== undefined) {
+      andFilters.push({ idAutor: params.idAutor });
+    }
+
+    if (params.generoIds && params.generoIds.length > 0) {
+      andFilters.push({
+        generos: { some: { idGenero: { in: params.generoIds } } },
+      });
+    }
+
+    if (params.anoMin !== undefined || params.anoMax !== undefined) {
+      andFilters.push({
+        anoPublicacion: {
+          gte: params.anoMin,
+          lte: params.anoMax,
+        },
+      });
+    }
+
+    return this.prisma.libro.findMany({
+      where: andFilters.length ? { AND: andFilters } : undefined,
+      include: {
+        generos: {
+          include: {
+            genero: true,
+          },
+        },
+      },
+    });
+  }
+
   create(createLibroDto: CreateLibroDto) {
     const { idGeneros, ...libroData } = createLibroDto;
     const uniqueGenreIds = Array.from(new Set(idGeneros));
