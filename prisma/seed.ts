@@ -3,11 +3,14 @@ import { PrismaClient } from '../node_modules/.prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
-const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
+const connectionString =
+  process.env.SEED_DATABASE_URL ??
+  process.env.DIRECT_URL ??
+  process.env.DATABASE_URL;
 
 if (!connectionString) {
   throw new Error(
-    'DIRECT_URL o DATABASE_URL debe estar definido para ejecutar seeds',
+    'SEED_DATABASE_URL, DIRECT_URL o DATABASE_URL debe estar definido para ejecutar seeds',
   );
 }
 
@@ -259,67 +262,50 @@ async function seedLibroGenero() {
 }
 
 async function seedInventario() {
-  const tienda = await prisma.tienda.findFirst({
-    where: { nombre: 'Tienda Centro' },
+  const tiendas = await prisma.tienda.findMany({
+    select: { id: true, nombre: true },
+    orderBy: { id: 'asc' },
   });
-  if (!tienda) {
-    throw new Error('No se encontro tienda para sembrar inventario');
+
+  const libros = await prisma.libro.findMany({
+    select: { id: true, titulo: true },
+    orderBy: { titulo: 'asc' },
+  });
+
+  if (tiendas.length === 0) {
+    throw new Error('No hay tiendas para sembrar inventario');
   }
 
-  const inventarioLibro1 = await prisma.inventario.findFirst({
-    where: {
-      idLibro: IDS.libro1,
-      idTienda: tienda.id,
-    },
-  });
-
-  if (!inventarioLibro1) {
-    await prisma.inventario.create({
-      data: {
-        idLibro: IDS.libro1,
-        idTienda: tienda.id,
-        cantidadDisponible: 30,
-        cantidadBloqueada: 2,
-        fechaActualizacion: new Date(),
-      },
-    });
-  } else {
-    await prisma.inventario.update({
-      where: { id: inventarioLibro1.id },
-      data: {
-        cantidadDisponible: 30,
-        cantidadBloqueada: 2,
-        fechaActualizacion: new Date(),
-      },
-    });
+  if (libros.length === 0) {
+    throw new Error('No hay libros para sembrar inventario');
   }
 
-  const inventarioLibro2 = await prisma.inventario.findFirst({
-    where: {
-      idLibro: IDS.libro2,
-      idTienda: tienda.id,
-    },
-  });
+  for (const tienda of tiendas) {
+    for (const [index, libro] of libros.entries()) {
+      const cantidadDisponible = 10 + ((index + tienda.id) % 21);
+      const cantidadBloqueada = (index + tienda.id) % 3;
 
-  if (!inventarioLibro2) {
-    await prisma.inventario.create({
-      data: {
-        idLibro: IDS.libro2,
-        idTienda: tienda.id,
-        cantidadDisponible: 12,
-        cantidadBloqueada: 1,
-        fechaActualizacion: new Date(),
-      },
-    });
-  } else {
-    await prisma.inventario.update({
-      where: { id: inventarioLibro2.id },
-      data: {
-        cantidadDisponible: 12,
-        cantidadBloqueada: 1,
-        fechaActualizacion: new Date(),
-      },
-    });
+      await prisma.inventario.upsert({
+        where: {
+          idLibro_idTienda: {
+            idLibro: libro.id,
+            idTienda: tienda.id,
+          },
+        },
+        update: {
+          cantidadDisponible,
+          cantidadBloqueada,
+          fechaActualizacion: new Date(),
+        },
+        create: {
+          idLibro: libro.id,
+          idTienda: tienda.id,
+          cantidadDisponible,
+          cantidadBloqueada,
+          fechaActualizacion: new Date(),
+        },
+      });
+    }
   }
 }
 

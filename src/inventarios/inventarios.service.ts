@@ -9,11 +9,153 @@ import { UpdateInventarioDto } from './dto/update-inventario.dto';
 import { AddLibrosPorGeneroDto } from './dto/add-libros-por-genero.dto';
 import { UpdateCantidadLibroDto } from './dto/update-cantidad-libro.dto';
 import { BloquearLibrosDto } from './dto/bloquear-libros.dto';
+import { AddExistenciasLibroDto } from './dto/add-existencias-libro.dto';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class InventariosService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async findLibrosAgotados() {
+    const libros = await this.prisma.libro.findMany({
+      include: {
+        autor: {
+          select: {
+            id: true,
+            nombre: true,
+          },
+        },
+        editorial: {
+          select: {
+            id: true,
+            nombre: true,
+          },
+        },
+        inventarios: {
+          select: {
+            cantidadDisponible: true,
+            cantidadBloqueada: true,
+            fechaActualizacion: true,
+          },
+        },
+      },
+    });
+
+    return libros
+      .map((libro) => {
+        const totalDisponible = libro.inventarios.reduce(
+          (acc, inv) => acc + inv.cantidadDisponible,
+          0,
+        );
+        const totalBloqueada = libro.inventarios.reduce(
+          (acc, inv) => acc + inv.cantidadBloqueada,
+          0,
+        );
+
+        const ultimaActualizacion = libro.inventarios.reduce<Date>(
+          (maxFecha, inv) =>
+            inv.fechaActualizacion > maxFecha ? inv.fechaActualizacion : maxFecha,
+          new Date(0),
+        );
+
+        return {
+          idLibro: libro.id,
+          titulo: libro.titulo,
+          isbn: libro.isbn,
+          estado: libro.estado,
+          idAutor: libro.idAutor,
+          idEditorial: libro.idEditorial,
+          autor: libro.autor,
+          editorial: libro.editorial,
+          imagenPortada: libro.imagenPortada,
+          totalDisponible,
+          totalBloqueada,
+          tiendasAfectadas: libro.inventarios.length,
+          ultimaActualizacion,
+        };
+      })
+      .filter((libro) => libro.totalDisponible === 0)
+      .sort((a, b) => a.titulo.localeCompare(b.titulo));
+  }
+
+  async findLibrosAgotadosAdmin() {
+    const inventarios = await this.prisma.inventario.findMany({
+      include: {
+        tienda: {
+          select: {
+            id: true,
+            nombre: true,
+          },
+        },
+        libro: {
+          include: {
+            autor: {
+              select: {
+                id: true,
+                nombre: true,
+              },
+            },
+            editorial: {
+              select: {
+                id: true,
+                nombre: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: [{ idLibro: 'asc' }, { idTienda: 'asc' }],
+    });
+
+    const resumenPorLibro = new Map<string, any>();
+
+    for (const inventario of inventarios) {
+      const existente = resumenPorLibro.get(inventario.idLibro);
+
+      if (!existente) {
+        resumenPorLibro.set(inventario.idLibro, {
+          idLibro: inventario.idLibro,
+          titulo: inventario.libro.titulo,
+          isbn: inventario.libro.isbn,
+          autor: inventario.libro.autor,
+          editorial: inventario.libro.editorial,
+          totalDisponible: inventario.cantidadDisponible,
+          totalBloqueada: inventario.cantidadBloqueada,
+          ultimaActualizacion: inventario.fechaActualizacion,
+          inventarios: [
+            {
+              idInventario: inventario.id,
+              idTienda: inventario.idTienda,
+              nombreTienda: inventario.tienda.nombre,
+              cantidadDisponible: inventario.cantidadDisponible,
+              cantidadBloqueada: inventario.cantidadBloqueada,
+              fechaActualizacion: inventario.fechaActualizacion,
+            },
+          ],
+        });
+        continue;
+      }
+
+      existente.totalDisponible += inventario.cantidadDisponible;
+      existente.totalBloqueada += inventario.cantidadBloqueada;
+      existente.inventarios.push({
+        idInventario: inventario.id,
+        idTienda: inventario.idTienda,
+        nombreTienda: inventario.tienda.nombre,
+        cantidadDisponible: inventario.cantidadDisponible,
+        cantidadBloqueada: inventario.cantidadBloqueada,
+        fechaActualizacion: inventario.fechaActualizacion,
+      });
+
+      if (inventario.fechaActualizacion > existente.ultimaActualizacion) {
+        existente.ultimaActualizacion = inventario.fechaActualizacion;
+      }
+    }
+
+    return Array.from(resumenPorLibro.values())
+      .filter((libro) => libro.totalDisponible === 0)
+      .sort((a, b) => a.titulo.localeCompare(b.titulo));
+  }
 
   async create(createInventarioDto: CreateInventarioDto) {
     const existingInventario = await this.prisma.inventario.findFirst({
@@ -254,6 +396,39 @@ export class InventariosService {
         },
         cantidadBloqueada: {
           increment: bloquearLibrosDto.cantidadABloquear,
+        },
+        fechaActualizacion: new Date(),
+      },
+    });
+  }
+
+  async addExistenciasLibro(
+    idTienda: number,
+    idLibro: string,
+    addExistenciasLibroDto: AddExistenciasLibroDto,
+  ) {
+    if (addExistenciasLibroDto.cantidadAAgregar <= 0) {
+      throw new BadRequestException('La cantidad a agregar debe ser mayor a 0');
+    }
+
+    const inventario = await this.getInventarioUnicoPorLibroYTienda(
+      idLibro,
+      idTienda,
+    );
+
+    if (!inventario) {
+      throw new NotFoundException(
+        'No existe inventario para ese libro en la tienda indicada',
+      );
+    }
+
+    return this.prisma.inventario.update({
+      where: {
+        id: inventario.id,
+      },
+      data: {
+        cantidadDisponible: {
+          increment: addExistenciasLibroDto.cantidadAAgregar,
         },
         fechaActualizacion: new Date(),
       },

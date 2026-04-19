@@ -15,6 +15,7 @@ import { UpdateInventarioDto } from './dto/update-inventario.dto';
 import { AddLibrosPorGeneroDto } from './dto/add-libros-por-genero.dto';
 import { UpdateCantidadLibroDto } from './dto/update-cantidad-libro.dto';
 import { BloquearLibrosDto } from './dto/bloquear-libros.dto';
+import { AddExistenciasLibroDto } from './dto/add-existencias-libro.dto';
 import { AuthGuard, RolesGuard, Public, Roles } from '../common';
 
 @ApiTags('inventarios')
@@ -51,6 +52,18 @@ export class InventariosController {
   }
 
   @Public()
+  @Get('libros-agotados')
+  findLibrosAgotados() {
+    return this.inventariosService.findLibrosAgotados();
+  }
+
+  @Roles('administrador')
+  @Get('libros-agotados/admin')
+  findLibrosAgotadosAdmin() {
+    return this.inventariosService.findLibrosAgotadosAdmin();
+  }
+
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.inventariosService.findOne(+id);
@@ -76,6 +89,20 @@ export class InventariosController {
       +idTienda,
       idLibro,
       updateCantidadLibroDto,
+    );
+  }
+
+  @Roles('administrador')
+  @Patch('tiendas/:idTienda/libros/:idLibro/agregar-existencias')
+  addExistenciasLibro(
+    @Param('idTienda') idTienda: string,
+    @Param('idLibro') idLibro: string,
+    @Body() addExistenciasLibroDto: AddExistenciasLibroDto,
+  ) {
+    return this.inventariosService.addExistenciasLibro(
+      +idTienda,
+      idLibro,
+      addExistenciasLibroDto,
     );
   }
 
