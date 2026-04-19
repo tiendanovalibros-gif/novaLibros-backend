@@ -86,9 +86,7 @@ export class CarritosService {
       const cantidadTotalSolicitada = cantidadActualEnCarrito + dto.cantidad;
 
       if (cantidadDisponible < cantidadTotalSolicitada) {
-        throw new BadRequestException(
-          `No hay existencias suficientes. Disponibles: ${cantidadDisponible}, solicitadas: ${cantidadTotalSolicitada}`,
-        );
+        throw new BadRequestException('No hay existencias disponibles');
       }
 
       if (detalleExistente) {
@@ -242,9 +240,7 @@ export class CarritosService {
         disponibilidadInventario._sum.cantidadDisponible ?? 0;
 
       if (cantidad > cantidadDisponible) {
-        throw new BadRequestException(
-          `No hay existencias suficientes. Disponibles: ${cantidadDisponible}, solicitadas: ${cantidad}`,
-        );
+        throw new BadRequestException('No hay existencias disponibles');
       }
 
       await tx.detalleCarrito.update({

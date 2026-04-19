@@ -348,6 +348,7 @@ export class ReservasService {
       }
 
       const carrito = await this.getOrCreateMine(currentUser.sub, tx);
+      let seActualizoAlMenosUnItem = false;
 
       for (const item of reserva.itemsReserva) {
         const libro = await tx.libro.findUnique({
@@ -398,6 +399,14 @@ export class ReservasService {
             },
           });
         }
+
+        seActualizoAlMenosUnItem = true;
+      }
+
+      if (!seActualizoAlMenosUnItem) {
+        throw new BadRequestException(
+          'Este libro ya está en tu carrito con una cantidad igual o mayor a la reservada',
+        );
       }
 
       await tx.carritoCompras.update({
