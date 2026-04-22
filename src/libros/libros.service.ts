@@ -7,6 +7,21 @@ import { PrismaService } from '../prisma/prisma.service';
 export class LibrosService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private withGeneroCompatibility(libro: any) {
+    const idGeneros = Array.isArray(libro?.generos)
+      ? libro.generos
+          .map((rel: any) => rel?.idGenero)
+          .filter((id: unknown) => typeof id === 'number')
+      : [];
+
+    return {
+      ...libro,
+      // Compatibilidad temporal con frontend que aun consume un unico genero
+      idGeneros,
+      idGenero: idGeneros[0] ?? 0,
+    };
+  }
+
   search(params: {
     q?: string;
     idAutor?: number;
@@ -57,62 +72,74 @@ export class LibrosService {
       });
     }
 
-    return this.prisma.libro.findMany({
-      where: andFilters.length ? { AND: andFilters } : undefined,
-      include: {
-        generos: {
-          include: {
-            genero: true,
+    return this.prisma.libro
+      .findMany({
+        where: andFilters.length ? { AND: andFilters } : undefined,
+        include: {
+          generos: {
+            include: {
+              genero: true,
+            },
           },
         },
-      },
-    });
+      })
+      .then((libros) =>
+        libros.map((libro) => this.withGeneroCompatibility(libro)),
+      );
   }
 
   create(createLibroDto: CreateLibroDto) {
     const { idGeneros, ...libroData } = createLibroDto;
     const uniqueGenreIds = Array.from(new Set(idGeneros));
 
-    return this.prisma.libro.create({
-      data: {
-        ...libroData,
-        generos: {
-          create: uniqueGenreIds.map((idGenero) => ({ idGenero })),
-        },
-      } as any,
-      include: {
-        generos: {
-          include: {
-            genero: true,
+    return this.prisma.libro
+      .create({
+        data: {
+          ...libroData,
+          generos: {
+            create: uniqueGenreIds.map((idGenero) => ({ idGenero })),
+          },
+        } as any,
+        include: {
+          generos: {
+            include: {
+              genero: true,
+            },
           },
         },
-      },
-    });
+      })
+      .then((libro) => this.withGeneroCompatibility(libro));
   }
 
   findAll() {
-    return this.prisma.libro.findMany({
-      include: {
-        generos: {
-          include: {
-            genero: true,
+    return this.prisma.libro
+      .findMany({
+        include: {
+          generos: {
+            include: {
+              genero: true,
+            },
           },
         },
-      },
-    });
+      })
+      .then((libros) =>
+        libros.map((libro) => this.withGeneroCompatibility(libro)),
+      );
   }
 
   findOne(id: string) {
-    return this.prisma.libro.findUnique({
-      where: { id },
-      include: {
-        generos: {
-          include: {
-            genero: true,
+    return this.prisma.libro
+      .findUnique({
+        where: { id },
+        include: {
+          generos: {
+            include: {
+              genero: true,
+            },
           },
         },
-      },
-    });
+      })
+      .then((libro) => (libro ? this.withGeneroCompatibility(libro) : libro));
   }
 
   update(id: string, updateLibroDto: UpdateLibroDto) {
@@ -127,17 +154,19 @@ export class LibrosService {
       };
     }
 
-    return this.prisma.libro.update({
-      where: { id },
-      data,
-      include: {
-        generos: {
-          include: {
-            genero: true,
+    return this.prisma.libro
+      .update({
+        where: { id },
+        data,
+        include: {
+          generos: {
+            include: {
+              genero: true,
+            },
           },
         },
-      },
-    });
+      })
+      .then((libro) => this.withGeneroCompatibility(libro));
   }
 
   remove(id: string) {
