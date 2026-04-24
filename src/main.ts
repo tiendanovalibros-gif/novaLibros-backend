@@ -12,6 +12,7 @@ async function bootstrap() {
       'http://localhost:3000',
       'http://localhost:3001',
       'https://nova-libros-frontend.vercel.app',
+      'https://www.novalibros.app/',
     ],
     credentials: true,
   });
