@@ -277,6 +277,57 @@ export class InventariosService {
     });
   }
 
+  async findByTienda(idTienda: number) {
+    const inventarios = await this.prisma.inventario.findMany({
+      where: { idTienda },
+      include: {
+        libro: {
+          select: {
+            id: true,
+            titulo: true,
+            isbn: true,
+            imagenPortada: true,
+            precio: true,
+            estado: true,
+            autor: { select: { id: true, nombre: true } },
+            editorial: { select: { id: true, nombre: true } },
+          },
+        },
+      },
+      orderBy: { libro: { titulo: 'asc' } },
+    });
+
+    const totalDisponible = inventarios.reduce(
+      (acc, inv) => acc + inv.cantidadDisponible,
+      0,
+    );
+    const totalBloqueada = inventarios.reduce(
+      (acc, inv) => acc + inv.cantidadBloqueada,
+      0,
+    );
+    const librosAgotados = inventarios.filter(
+      (inv) => inv.cantidadDisponible === 0,
+    ).length;
+
+    return {
+      resumen: {
+        totalItems: inventarios.length,
+        totalDisponible,
+        totalBloqueada,
+        librosAgotados,
+      },
+      inventarios: inventarios.map((inv) => ({
+        id: inv.id,
+        idLibro: inv.idLibro,
+        idTienda: inv.idTienda,
+        cantidadDisponible: inv.cantidadDisponible,
+        cantidadBloqueada: inv.cantidadBloqueada,
+        fechaActualizacion: inv.fechaActualizacion,
+        libro: inv.libro,
+      })),
+    };
+  }
+
   findAll() {
     return this.prisma.inventario.findMany();
   }

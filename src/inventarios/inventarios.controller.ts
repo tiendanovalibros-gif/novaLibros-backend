@@ -63,6 +63,12 @@ export class InventariosController {
     return this.inventariosService.findLibrosAgotadosAdmin();
   }
 
+  @Roles('administrador')
+  @Get('tiendas/:idTienda')
+  findByTienda(@Param('idTienda') idTienda: string) {
+    return this.inventariosService.findByTienda(+idTienda);
+  }
+
   @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
