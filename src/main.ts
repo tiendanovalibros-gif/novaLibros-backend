@@ -6,16 +6,12 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Habilitar CORS para permitir peticiones desde el frontend
+  // CORS: acepta cualquier origen (refleja el Origin de la petición)
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'https://nova-libros-frontend.vercel.app',
-      'https://www.novalibros.app',
-      'https://novalibros.app',
-    ],
+    origin: true,
     credentials: true,
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
 
   const config = new DocumentBuilder()
