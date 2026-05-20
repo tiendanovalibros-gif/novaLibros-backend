@@ -8,11 +8,25 @@ export class MovimientosSaldoService {
   constructor(private readonly prisma: PrismaService) {}
 
   create(createMovimientosSaldoDto: CreateMovimientosSaldoDto) {
-    return this.prisma.movimientoSaldo.create({ data: createMovimientosSaldoDto as any });
+    return this.prisma.movimientoSaldo.create({
+      data: createMovimientosSaldoDto as any,
+    });
   }
 
   findAll() {
     return this.prisma.movimientoSaldo.findMany();
+  }
+
+  findByUsuario(idUsuario: string, tipo?: string) {
+    return this.prisma.movimientoSaldo.findMany({
+      where: {
+        idUsuario,
+        ...(tipo ? { tipoMovimiento: tipo as any } : {}),
+      },
+      include: { metodoPago: true },
+      orderBy: { id: 'desc' },
+      take: 50,
+    });
   }
 
   findOne(id: number) {
@@ -20,7 +34,10 @@ export class MovimientosSaldoService {
   }
 
   update(id: number, updateMovimientosSaldoDto: UpdateMovimientosSaldoDto) {
-    return this.prisma.movimientoSaldo.update({ where: { id }, data: updateMovimientosSaldoDto as any });
+    return this.prisma.movimientoSaldo.update({
+      where: { id },
+      data: updateMovimientosSaldoDto as any,
+    });
   }
 
   remove(id: number) {

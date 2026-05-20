@@ -15,6 +15,7 @@ import { CreateCarritoDto } from './dto/create-carrito.dto';
 import { UpdateCarritoDto } from './dto/update-carrito.dto';
 import { AddItemCarritoDto } from './dto/add-item-carrito.dto';
 import { UpdateItemCantidadDto } from './dto/update-item-cantidad.dto';
+import { CheckoutCarritoDto } from './dto/checkout-carrito.dto';
 import { AuthGuard, RolesGuard, Roles, CurrentUser } from '../common';
 import type { JwtPayload } from '../utils';
 
@@ -60,6 +61,15 @@ export class CarritosController {
     @CurrentUser() currentUser: JwtPayload,
   ) {
     return this.carritosService.removeItemFromMine(currentUser, idDetalle);
+  }
+
+  @Roles('cliente')
+  @Post('me/checkout')
+  checkoutFromMine(
+    @Body() dto: CheckoutCarritoDto,
+    @CurrentUser() currentUser: JwtPayload,
+  ) {
+    return this.carritosService.checkoutFromMine(currentUser, dto);
   }
 
   @Post()

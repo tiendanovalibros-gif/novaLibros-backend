@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+  Request,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { MovimientosSaldoService } from './movimientos-saldo.service';
 import { CreateMovimientosSaldoDto } from './dto/create-movimientos-saldo.dto';
@@ -10,7 +21,9 @@ import { AuthGuard, RolesGuard, Roles } from '../common';
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('movimientos-saldo')
 export class MovimientosSaldoController {
-  constructor(private readonly movimientosSaldoService: MovimientosSaldoService) {}
+  constructor(
+    private readonly movimientosSaldoService: MovimientosSaldoService,
+  ) {}
 
   @Post()
   create(@Body() createMovimientosSaldoDto: CreateMovimientosSaldoDto) {
@@ -23,6 +36,13 @@ export class MovimientosSaldoController {
     return this.movimientosSaldoService.findAll();
   }
 
+  // Ruta: GET /movimientos-saldo/me
+  // Historial de movimientos del usuario autenticado
+  @Get('me')
+  findMine(@Request() req, @Query('tipo') tipo?: string) {
+    return this.movimientosSaldoService.findByUsuario(req.user.sub, tipo);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.movimientosSaldoService.findOne(+id);
@@ -30,7 +50,10 @@ export class MovimientosSaldoController {
 
   @Roles('administrador')
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMovimientosSaldoDto: UpdateMovimientosSaldoDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateMovimientosSaldoDto: UpdateMovimientosSaldoDto,
+  ) {
     return this.movimientosSaldoService.update(+id, updateMovimientosSaldoDto);
   }
 

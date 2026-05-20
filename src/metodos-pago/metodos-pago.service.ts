@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { CreateMetodosPagoDto } from './dto/create-metodos-pago.dto';
 import { UpdateMetodosPagoDto } from './dto/update-metodos-pago.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -15,12 +15,27 @@ export class MetodosPagoService {
     return this.prisma.metodoPago.findMany();
   }
 
+  findByUsuario(idUsuario: string) {
+    return this.prisma.metodoPago.findMany({
+      where: { idUsuario },
+      orderBy: { id: 'desc' },
+    });
+  }
+
   findOne(id: number) {
     return this.prisma.metodoPago.findUnique({ where: { id } });
   }
 
   update(id: number, updateMetodosPagoDto: UpdateMetodosPagoDto) {
     return this.prisma.metodoPago.update({ where: { id }, data: updateMetodosPagoDto as any });
+  }
+
+  async removeIfOwner(id: number, idUsuario: string) {
+    const metodo = await this.prisma.metodoPago.findUnique({ where: { id } });
+    if (!metodo || metodo.idUsuario !== idUsuario) {
+      throw new ForbiddenException('No tienes permiso para eliminar este metodo de pago');
+    }
+    return this.prisma.metodoPago.delete({ where: { id } });
   }
 
   remove(id: number) {
