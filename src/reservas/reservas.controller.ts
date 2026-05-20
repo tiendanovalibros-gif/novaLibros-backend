@@ -12,7 +12,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ReservasService } from './reservas.service';
 import { CreateReservaDto } from './dto/create-reserva.dto';
 import { UpdateReservaDto } from './dto/update-reserva.dto';
-import { AuthGuard, RolesGuard, Roles, CurrentUser } from '../common';
+import { AuthGuard, RolesGuard, Roles, CurrentUser, UuidPipe } from '../common';
 import type { JwtPayload } from '../utils';
 
 @ApiTags('reservas')
@@ -43,24 +43,33 @@ export class ReservasController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @CurrentUser() currentUser: JwtPayload) {
+  findOne(
+    @Param('id', UuidPipe) id: string,
+    @CurrentUser() currentUser: JwtPayload,
+  ) {
     return this.reservasService.findOne(id, currentUser);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReservaDto: UpdateReservaDto) {
+  update(
+    @Param('id', UuidPipe) id: string,
+    @Body() updateReservaDto: UpdateReservaDto,
+  ) {
     return this.reservasService.update(id, updateReservaDto);
   }
 
   @Patch(':id/cancel')
-  cancel(@Param('id') id: string, @CurrentUser() currentUser: JwtPayload) {
+  cancel(
+    @Param('id', UuidPipe) id: string,
+    @CurrentUser() currentUser: JwtPayload,
+  ) {
     return this.reservasService.cancel(id, currentUser);
   }
 
   @Roles('cliente')
   @Patch(':id/convert-to-cart')
   convertToCart(
-    @Param('id') id: string,
+    @Param('id', UuidPipe) id: string,
     @CurrentUser() currentUser: JwtPayload,
   ) {
     return this.reservasService.convertToCart(id, currentUser);
@@ -68,7 +77,7 @@ export class ReservasController {
 
   @Roles('administrador', 'root')
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', UuidPipe) id: string) {
     return this.reservasService.remove(id);
   }
 }

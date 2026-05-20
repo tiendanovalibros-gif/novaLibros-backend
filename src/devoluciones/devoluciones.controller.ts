@@ -3,7 +3,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { DevolucionesService } from './devoluciones.service';
 import { CreateDevolucioneDto } from './dto/create-devolucione.dto';
 import { UpdateDevolucioneDto } from './dto/update-devolucione.dto';
-import { AuthGuard, RolesGuard, Roles } from '../common';
+import { AuthGuard, RolesGuard, Roles, UuidPipe } from '../common';
 
 @ApiTags('devoluciones')
 @ApiBearerAuth()
@@ -24,19 +24,22 @@ export class DevolucionesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', UuidPipe) id: string) {
     return this.devolucionesService.findOne(id);
   }
 
   @Roles('administrador')
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDevolucioneDto: UpdateDevolucioneDto) {
+  update(
+    @Param('id', UuidPipe) id: string,
+    @Body() updateDevolucioneDto: UpdateDevolucioneDto,
+  ) {
     return this.devolucionesService.update(id, updateDevolucioneDto);
   }
 
   @Roles('administrador')
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', UuidPipe) id: string) {
     return this.devolucionesService.remove(id);
   }
 }

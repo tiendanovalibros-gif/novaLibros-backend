@@ -3,7 +3,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { PedidosService } from './pedidos.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { UpdatePedidoDto } from './dto/update-pedido.dto';
-import { AuthGuard, RolesGuard, Roles } from '../common';
+import { AuthGuard, RolesGuard, Roles, UuidPipe } from '../common';
 
 @ApiTags('pedidos')
 @ApiBearerAuth()
@@ -24,19 +24,22 @@ export class PedidosController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', UuidPipe) id: string) {
     return this.pedidosService.findOne(id);
   }
 
   @Roles('administrador')
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePedidoDto: UpdatePedidoDto) {
+  update(
+    @Param('id', UuidPipe) id: string,
+    @Body() updatePedidoDto: UpdatePedidoDto,
+  ) {
     return this.pedidosService.update(id, updatePedidoDto);
   }
 
   @Roles('administrador')
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', UuidPipe) id: string) {
     return this.pedidosService.remove(id);
   }
 }

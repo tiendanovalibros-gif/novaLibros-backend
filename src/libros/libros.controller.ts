@@ -14,7 +14,7 @@ import { LibrosService } from './libros.service';
 import { CreateLibroDto } from './dto/create-libro.dto';
 import { UpdateLibroDto } from './dto/update-libro.dto';
 import { SearchLibrosDto } from './dto/search-libros.dto';
-import { AuthGuard, RolesGuard, Public, Roles } from '../common';
+import { AuthGuard, RolesGuard, Public, Roles, UuidPipe } from '../common';
 
 @ApiTags('libros')
 @ApiBearerAuth()
@@ -62,19 +62,22 @@ export class LibrosController {
 
   @Public()
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', UuidPipe) id: string) {
     return this.librosService.findOne(id);
   }
 
   @Roles('administrador')
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLibroDto: UpdateLibroDto) {
+  update(
+    @Param('id', UuidPipe) id: string,
+    @Body() updateLibroDto: UpdateLibroDto,
+  ) {
     return this.librosService.update(id, updateLibroDto);
   }
 
   @Roles('administrador')
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', UuidPipe) id: string) {
     return this.librosService.remove(id);
   }
 }

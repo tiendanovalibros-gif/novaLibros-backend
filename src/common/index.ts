@@ -6,3 +6,6 @@ export { RolesGuard } from './guards/roles.guard';
 export { Public } from './decorators/public.decorator';
 export { Roles } from './decorators/roles.decorator';
 export { CurrentUser } from './decorators/current-user.decorator';
+
+// Pipes
+export { UuidPipe } from './pipes/uuid.pipe';

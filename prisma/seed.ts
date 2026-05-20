@@ -103,53 +103,71 @@ async function seedTiendas() {
   });
 }
 
-async function seedUsuarios() {
-  await prisma.usuario.upsert({
-    where: { correo: 'admin@novalibros.com' },
-    update: {
-      dni: '10000001',
-      nombre: 'Admin',
-      apellido: 'Nova',
-      fechaNacimiento: new Date('1990-01-01'),
-      contrasenaHash: '$2b$10$seedadminhashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-      rol: 'administrador',
-      estadoCuenta: true,
-    },
-    create: {
-      id: IDS.usuarioAdmin,
-      dni: '10000001',
-      nombre: 'Admin',
-      apellido: 'Nova',
-      fechaNacimiento: new Date('1990-01-01'),
-      correo: 'admin@novalibros.com',
-      contrasenaHash: '$2b$10$seedadminhashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-      rol: 'administrador',
-      estadoCuenta: true,
-    },
+async function upsertUsuarioByDni(data: {
+  id: string;
+  dni: string;
+  nombre: string;
+  apellido: string;
+  fechaNacimiento: Date;
+  correo: string;
+  contrasenaHash: string;
+  rol: 'administrador' | 'cliente';
+  estadoCuenta: boolean;
+}) {
+  const { id, ...payload } = data;
+
+  const existingByDni = await prisma.usuario.findUnique({
+    where: { dni: payload.dni },
   });
 
-  await prisma.usuario.upsert({
-    where: { correo: 'cliente@novalibros.com' },
-    update: {
-      dni: '10000002',
-      nombre: 'Cliente',
-      apellido: 'Demo',
-      fechaNacimiento: new Date('1998-06-15'),
-      contrasenaHash: '$2b$10$seedclientehashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-      rol: 'cliente',
-      estadoCuenta: true,
-    },
-    create: {
-      id: IDS.usuarioCliente,
-      dni: '10000002',
-      nombre: 'Cliente',
-      apellido: 'Demo',
-      fechaNacimiento: new Date('1998-06-15'),
-      correo: 'cliente@novalibros.com',
-      contrasenaHash: '$2b$10$seedclientehashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-      rol: 'cliente',
-      estadoCuenta: true,
-    },
+  if (existingByDni) {
+    await prisma.usuario.update({
+      where: { id: existingByDni.id },
+      data: payload,
+    });
+    return;
+  }
+
+  const existingByCorreo = await prisma.usuario.findUnique({
+    where: { correo: payload.correo },
+  });
+
+  if (existingByCorreo) {
+    await prisma.usuario.update({
+      where: { id: existingByCorreo.id },
+      data: payload,
+    });
+    return;
+  }
+
+  await prisma.usuario.create({
+    data: { id, ...payload },
+  });
+}
+
+async function seedUsuarios() {
+  await upsertUsuarioByDni({
+    id: IDS.usuarioAdmin,
+    dni: '10000001',
+    nombre: 'Admin',
+    apellido: 'Nova',
+    fechaNacimiento: new Date('1990-01-01'),
+    correo: 'admin@novalibros.com',
+    contrasenaHash: '$2b$10$seedadminhashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+    rol: 'administrador',
+    estadoCuenta: true,
+  });
+
+  await upsertUsuarioByDni({
+    id: IDS.usuarioCliente,
+    dni: '10000002',
+    nombre: 'Cliente',
+    apellido: 'Demo',
+    fechaNacimiento: new Date('1998-06-15'),
+    correo: 'cliente@novalibros.com',
+    contrasenaHash: '$2b$10$seedclientehashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+    rol: 'cliente',
+    estadoCuenta: true,
   });
 }
 
@@ -789,10 +807,10 @@ async function seedUsuarioPreferencia() {
 }
 
 async function main() {
-  await seedAutores();
-  await seedGeneros();
-  await seedEditoriales();
   await seedCiudades();
+  await seedAutores();
+  await seedEditoriales();
+  await seedGeneros();
   await seedTiendas();
   await seedUsuarios();
   await seedLibros();

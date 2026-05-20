@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { MetodoEntrega } from '@prisma/client';
 import { CreateCarritoDto } from './dto/create-carrito.dto';
 import { UpdateCarritoDto } from './dto/update-carrito.dto';
 import { AddItemCarritoDto } from './dto/add-item-carrito.dto';
@@ -379,7 +380,8 @@ export class CarritosService {
         select: { direccion: true },
       });
 
-      const metodoEntrega = dto.metodoEntrega ?? 'domicilio';
+      const metodoEntrega =
+        (dto.metodoEntrega ?? MetodoEntrega.domicilio) as MetodoEntrega;
       const direccionEntrega =
         dto.direccionEntrega ?? usuario?.direccion ?? null;
 

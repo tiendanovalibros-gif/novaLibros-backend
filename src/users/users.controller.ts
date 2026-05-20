@@ -23,7 +23,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { LoginResponseDto, RegisterResponseDto } from './dto/response.dto';
-import { AuthGuard, RolesGuard, Public, Roles, CurrentUser } from '../common';
+import {
+  AuthGuard,
+  RolesGuard,
+  Public,
+  Roles,
+  CurrentUser,
+  UuidPipe,
+} from '../common';
 import type { JwtPayload } from '../utils';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -154,7 +161,10 @@ export class UsersController {
   @ApiOperation({ summary: 'Obtener un usuario por ID' })
   @ApiResponse({ status: 200, description: 'Usuario encontrado' })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
-  findOne(@Param('id') id: string, @CurrentUser() currentUser: JwtPayload) {
+  findOne(
+    @Param('id', UuidPipe) id: string,
+    @CurrentUser() currentUser: JwtPayload,
+  ) {
     if (
       currentUser.rol !== 'root' &&
       currentUser.rol !== 'administrador' &&
@@ -172,7 +182,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Actualizar un usuario' })
   @ApiResponse({ status: 200, description: 'Usuario actualizado' })
   update(
-    @Param('id') id: string,
+    @Param('id', UuidPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
     @CurrentUser() currentUser: JwtPayload,
   ) {
@@ -194,7 +204,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Eliminar un usuario (Solo root/administrador)' })
   @ApiResponse({ status: 200, description: 'Usuario eliminado' })
   @ApiResponse({ status: 403, description: 'Sin permisos' })
-  remove(@Param('id') id: string) {
+  remove(@Param('id', UuidPipe) id: string) {
     return this.usersService.remove(id);
   }
 }
