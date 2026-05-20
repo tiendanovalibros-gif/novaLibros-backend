@@ -1,10 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsInt, IsPositive, IsUUID } from 'class-validator';
 
 export class CreateReservaDto {
   @ApiProperty({
     description: 'ID del libro a reservar',
     example: 'uuid-libro',
   })
+  @IsUUID()
   idLibro: string;
 
   @ApiProperty({
@@ -12,5 +14,7 @@ export class CreateReservaDto {
     example: 1,
     minimum: 1,
   })
+  @IsInt()
+  @IsPositive()
   cantidad: number;
 }

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
   UseGuards,
   ParseIntPipe,
 } from '@nestjs/common';
@@ -16,6 +17,7 @@ import { UpdateCarritoDto } from './dto/update-carrito.dto';
 import { AddItemCarritoDto } from './dto/add-item-carrito.dto';
 import { UpdateItemCantidadDto } from './dto/update-item-cantidad.dto';
 import { CheckoutCarritoDto } from './dto/checkout-carrito.dto';
+import { OpcionesRecogidaQueryDto } from './dto/opciones-recogida-query.dto';
 import { AuthGuard, RolesGuard, Roles, CurrentUser } from '../common';
 import type { JwtPayload } from '../utils';
 
@@ -61,6 +63,15 @@ export class CarritosController {
     @CurrentUser() currentUser: JwtPayload,
   ) {
     return this.carritosService.removeItemFromMine(currentUser, idDetalle);
+  }
+
+  @Roles('cliente')
+  @Get('me/opciones-recogida')
+  opcionesRecogida(
+    @Query() query: OpcionesRecogidaQueryDto,
+    @CurrentUser() currentUser: JwtPayload,
+  ) {
+    return this.carritosService.opcionesRecogida(currentUser, query);
   }
 
   @Roles('cliente')

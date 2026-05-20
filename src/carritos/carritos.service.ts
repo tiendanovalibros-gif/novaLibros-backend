@@ -10,7 +10,9 @@ import { CreateCarritoDto } from './dto/create-carrito.dto';
 import { UpdateCarritoDto } from './dto/update-carrito.dto';
 import { AddItemCarritoDto } from './dto/add-item-carrito.dto';
 import { CheckoutCarritoDto } from './dto/checkout-carrito.dto';
+import { OpcionesRecogidaQueryDto } from './dto/opciones-recogida-query.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { haversineKm } from '../common/utils/geo.util';
 import type { JwtPayload } from '../utils';
 
 @Injectable()
@@ -285,6 +287,95 @@ export class CarritosService {
     });
   }
 
+  async opcionesRecogida(
+    currentUser: JwtPayload,
+    query: OpcionesRecogidaQueryDto,
+  ) {
+    if (currentUser.rol !== 'cliente') {
+      throw new ForbiddenException('Solo los clientes pueden ver opciones de recogida');
+    }
+
+    const carrito = await this.getOrCreateMine(currentUser);
+    const detalles = await this.prisma.detalleCarrito.findMany({
+      where: { idCarrito: carrito.id },
+      select: { idLibro: true, cantidad: true },
+    });
+
+    if (detalles.length === 0) {
+      throw new BadRequestException('El carrito está vacío');
+    }
+
+    const libroIds = detalles.map((d) => d.idLibro);
+
+    const [tiendas, inventarios] = await Promise.all([
+      this.prisma.tienda.findMany({
+        include: { ciudad: true },
+        orderBy: { id: 'asc' },
+      }),
+      this.prisma.inventario.findMany({
+        where: { idLibro: { in: libroIds } },
+        select: { idTienda: true, idLibro: true, cantidadDisponible: true },
+      }),
+    ]);
+
+    const stockPorTiendaYLibro = new Map<string, number>();
+    for (const inv of inventarios) {
+      stockPorTiendaYLibro.set(`${inv.idTienda}:${inv.idLibro}`, inv.cantidadDisponible);
+    }
+
+    const tieneCoords =
+      typeof query.lat === 'number' &&
+      typeof query.lng === 'number' &&
+      Number.isFinite(query.lat) &&
+      Number.isFinite(query.lng);
+
+    const opciones = tiendas.map((tienda) => {
+      const faltantes: Array<{ idLibro: string; solicitado: number; disponible: number }> = [];
+
+      for (const { idLibro, cantidad } of detalles) {
+        const disponible = stockPorTiendaYLibro.get(`${tienda.id}:${idLibro}`) ?? 0;
+        if (disponible < cantidad) {
+          faltantes.push({ idLibro, solicitado: cantidad, disponible });
+        }
+      }
+
+      const distanciaKm =
+        tieneCoords
+          ? haversineKm(
+              query.lat!,
+              query.lng!,
+              Number(tienda.latitud),
+              Number(tienda.longitud),
+            )
+          : null;
+
+      return {
+        id: tienda.id,
+        nombre: tienda.nombre,
+        direccion: tienda.direccion,
+        direccionNormalizada: tienda.direccionNormalizada,
+        ciudad: tienda.ciudad?.nombre ?? null,
+        latitud: Number(tienda.latitud),
+        longitud: Number(tienda.longitud),
+        distanciaKm,
+        puedeCompletarCarrito: faltantes.length === 0,
+        faltantes,
+      };
+    });
+
+    opciones.sort((a, b) => {
+      if (a.puedeCompletarCarrito !== b.puedeCompletarCarrito) {
+        return a.puedeCompletarCarrito ? -1 : 1;
+      }
+      if (a.distanciaKm === null && b.distanciaKm === null) return 0;
+      if (a.distanciaKm === null) return 1;
+      if (b.distanciaKm === null) return -1;
+      return a.distanciaKm - b.distanciaKm;
+    });
+
+    return opciones;
+  }
+
   create(createCarritoDto: CreateCarritoDto) {
     return this.prisma.carritoCompras.create({ data: createCarritoDto as any });
   }
@@ -314,6 +405,11 @@ export class CarritosService {
     }
 
     return this.prisma.$transaction(async (tx) => {
+      const tienda = await tx.tienda.findUnique({ where: { id: dto.idTienda } });
+      if (!tienda) {
+        throw new NotFoundException(`Tienda con id ${dto.idTienda} no encontrada`);
+      }
+
       const carrito = await this.getOrCreateMine(currentUser, tx);
 
       const detalles = await tx.detalleCarrito.findMany({
@@ -331,25 +427,21 @@ export class CarritosService {
 
       const libroIds = detalles.map((detalle) => detalle.idLibro);
 
-      const disponibilidad = await tx.inventario.groupBy({
-        by: ['idLibro'],
-        where: { idLibro: { in: libroIds } },
-        _sum: { cantidadDisponible: true },
+      const inventariosTienda = await tx.inventario.findMany({
+        where: { idTienda: dto.idTienda, idLibro: { in: libroIds } },
+        select: { idLibro: true, cantidadDisponible: true },
       });
 
-      const disponiblesPorLibro = new Map<string, number>();
-      for (const item of disponibilidad) {
-        disponiblesPorLibro.set(
-          item.idLibro,
-          item._sum.cantidadDisponible ?? 0,
-        );
+      const disponiblePorLibro = new Map<string, number>();
+      for (const inv of inventariosTienda) {
+        disponiblePorLibro.set(inv.idLibro, inv.cantidadDisponible);
       }
 
       for (const detalle of detalles) {
-        const disponible = disponiblesPorLibro.get(detalle.idLibro) ?? 0;
+        const disponible = disponiblePorLibro.get(detalle.idLibro) ?? 0;
         if (detalle.cantidad > disponible) {
           throw new BadRequestException(
-            `No hay existencias disponibles para ${detalle.libro.titulo}`,
+            `La tienda "${tienda.nombre}" no tiene existencias suficientes para "${detalle.libro.titulo}" (disponible: ${disponible}, solicitado: ${detalle.cantidad})`,
           );
         }
       }
@@ -375,24 +467,15 @@ export class CarritosService {
         throw new BadRequestException('Saldo insuficiente');
       }
 
-      const usuario = await tx.usuario.findUnique({
-        where: { id: currentUser.sub },
-        select: { direccion: true },
-      });
-
-      const metodoEntrega =
-        (dto.metodoEntrega ?? MetodoEntrega.domicilio) as MetodoEntrega;
-      const direccionEntrega =
-        dto.direccionEntrega ?? usuario?.direccion ?? null;
-
       const pedido = await tx.pedido.create({
         data: {
           idUsuario: currentUser.sub,
           numeroOrden: this.generateNumeroOrden(),
           fechaOrden: new Date(),
           montoTotal,
-          metodoEntrega,
-          direccionEntrega,
+          metodoEntrega: MetodoEntrega.tienda,
+          idTienda: dto.idTienda,
+          direccionEntrega: null,
         },
       });
 
@@ -418,6 +501,7 @@ export class CarritosService {
           tx,
           detalle.idLibro,
           detalle.cantidad,
+          dto.idTienda,
         );
       }
 
@@ -452,6 +536,8 @@ export class CarritosService {
         pedidoId: pedido.id,
         numeroOrden: pedido.numeroOrden,
         montoTotal: pedido.montoTotal,
+        idTienda: pedido.idTienda,
+        nombreTienda: tienda.nombre,
         saldoDisponible: saldoActualizado.saldoDisponible,
       };
     });
@@ -497,46 +583,28 @@ export class CarritosService {
     tx: PrismaService | any,
     idLibro: string,
     cantidad: number,
+    idTienda: number,
   ) {
     if (cantidad <= 0) {
       return;
     }
 
-    const inventarios = await tx.inventario.findMany({
+    const actualizado = await tx.inventario.updateMany({
       where: {
         idLibro,
-        cantidadDisponible: { gt: 0 },
+        idTienda,
+        cantidadDisponible: { gte: cantidad },
       },
-      orderBy: { cantidadDisponible: 'desc' },
-      select: { id: true, cantidadDisponible: true },
+      data: {
+        cantidadDisponible: { decrement: cantidad },
+        fechaActualizacion: new Date(),
+      },
     });
 
-    let restante = cantidad;
-
-    for (const inventario of inventarios) {
-      if (restante <= 0) break;
-      const tomar = Math.min(inventario.cantidadDisponible, restante);
-
-      const actualizado = await tx.inventario.updateMany({
-        where: {
-          id: inventario.id,
-          cantidadDisponible: { gte: tomar },
-        },
-        data: {
-          cantidadDisponible: { decrement: tomar },
-          fechaActualizacion: new Date(),
-        },
-      });
-
-      if (actualizado.count === 0) {
-        throw new ConflictException('Existencias insuficientes');
-      }
-
-      restante -= tomar;
-    }
-
-    if (restante > 0) {
-      throw new BadRequestException('No hay existencias disponibles');
+    if (actualizado.count === 0) {
+      throw new ConflictException(
+        `Existencias insuficientes en la tienda para el libro ${idLibro}`,
+      );
     }
   }
 }
