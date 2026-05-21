@@ -3,7 +3,8 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { PedidosService } from './pedidos.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { UpdatePedidoDto } from './dto/update-pedido.dto';
-import { AuthGuard, RolesGuard, Roles, UuidPipe } from '../common';
+import { AuthGuard, RolesGuard, Roles, UuidPipe, CurrentUser } from '../common';
+import type { JwtPayload } from '../utils';
 
 @ApiTags('pedidos')
 @ApiBearerAuth()
@@ -23,9 +24,13 @@ export class PedidosController {
     return this.pedidosService.findAll();
   }
 
+  @Roles('cliente', 'administrador')
   @Get(':id')
-  findOne(@Param('id', UuidPipe) id: string) {
-    return this.pedidosService.findOne(id);
+  findOne(
+    @Param('id', UuidPipe) id: string,
+    @CurrentUser() currentUser: JwtPayload,
+  ) {
+    return this.pedidosService.findOneForUser(id, currentUser);
   }
 
   @Roles('administrador')

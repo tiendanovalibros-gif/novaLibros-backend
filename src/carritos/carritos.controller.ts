@@ -75,6 +75,15 @@ export class CarritosController {
   }
 
   @Roles('cliente')
+  @Get('me/opciones-entrega')
+  opcionesEntrega(
+    @Query() query: OpcionesRecogidaQueryDto,
+    @CurrentUser() currentUser: JwtPayload,
+  ) {
+    return this.carritosService.opcionesEntrega(currentUser, query);
+  }
+
+  @Roles('cliente')
   @Post('me/checkout')
   checkoutFromMine(
     @Body() dto: CheckoutCarritoDto,

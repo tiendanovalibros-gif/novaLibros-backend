@@ -30,6 +30,7 @@ enum EstadoReserva {
 enum MetodoEntrega {
   domicilio
   tienda
+  express
 }
 
 enum EstadoPedidoVal {
