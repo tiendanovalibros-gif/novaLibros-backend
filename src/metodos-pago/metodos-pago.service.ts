@@ -11,6 +11,13 @@ export class MetodosPagoService {
     return this.prisma.metodoPago.create({ data: createMetodosPagoDto as any });
   }
 
+  createForUsuario(idUsuario: string, dto: CreateMetodosPagoDto) {
+    const { tipo, numeroEnmascarado, titular } = dto;
+    return this.prisma.metodoPago.create({
+      data: { idUsuario, tipo, numeroEnmascarado, titular },
+    });
+  }
+
   findAll() {
     return this.prisma.metodoPago.findMany();
   }

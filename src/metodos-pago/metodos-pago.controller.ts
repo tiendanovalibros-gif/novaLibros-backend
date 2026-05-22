@@ -13,8 +13,8 @@ export class MetodosPagoController {
   constructor(private readonly metodosPagoService: MetodosPagoService) {}
 
   @Post()
-  create(@Body() createMetodosPagoDto: CreateMetodosPagoDto) {
-    return this.metodosPagoService.create(createMetodosPagoDto);
+  create(@Request() req, @Body() createMetodosPagoDto: CreateMetodosPagoDto) {
+    return this.metodosPagoService.createForUsuario(req.user.sub, createMetodosPagoDto);
   }
 
   @Roles('administrador')
