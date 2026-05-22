@@ -10,6 +10,7 @@ import { UpdateTiendaDto } from './dto/update-tienda.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { GeocodingService } from './geocoding.service';
 import { ValidateTiendaDireccionDto } from './dto/validate-tienda-direccion.dto';
+import { UpdateTiendaUbicacionDto } from './dto/update-tienda-ubicacion.dto';
 
 type TiendaConCiudad = Prisma.TiendaGetPayload<{
   include: { ciudad: true };
@@ -32,12 +33,14 @@ export class TiendasService {
 
     const ciudad = await this.findOrCreateCity(input.ciudad);
 
+    const coords = this.resolveCoords(input, geocodingResult);
+
     const data = {
       nombre: input.nombre,
       direccion: input.direccion,
       direccionNormalizada: geocodingResult.direccionNormalizada,
-      latitud: geocodingResult.latitud,
-      longitud: geocodingResult.longitud,
+      latitud: coords.latitud,
+      longitud: coords.longitud,
       idCiudad: ciudad.id,
     };
 
@@ -107,12 +110,14 @@ export class TiendasService {
 
     const ciudad = await this.findOrCreateCity(input.ciudad);
 
+    const coords = this.resolveCoords(input, geocodingResult);
+
     const data = {
       nombre: input.nombre,
       direccion: input.direccion,
       direccionNormalizada: geocodingResult.direccionNormalizada,
-      latitud: geocodingResult.latitud,
-      longitud: geocodingResult.longitud,
+      latitud: coords.latitud,
+      longitud: coords.longitud,
       idCiudad: ciudad.id,
     };
 
@@ -138,6 +143,22 @@ export class TiendasService {
     return this.toTiendaResponse(tienda);
   }
 
+  async updateUbicacion(id: number, dto: UpdateTiendaUbicacionDto) {
+    this.validateTiendaId(id);
+    await this.findOne(id);
+
+    const tienda = await this.prisma.tienda.update({
+      where: { id },
+      data: {
+        latitud: dto.latitud,
+        longitud: dto.longitud,
+      },
+      include: { ciudad: true },
+    });
+
+    return this.toTiendaResponse(tienda);
+  }
+
   async remove(id: number) {
     this.validateTiendaId(id);
     await this.findOne(id);
@@ -152,6 +173,16 @@ export class TiendasService {
     } catch (error) {
       this.handlePrismaError(error);
     }
+  }
+
+  private resolveCoords(
+    input: CreateTiendaDto,
+    geocoding: { latitud: number; longitud: number },
+  ) {
+    if (input.latitud !== undefined && input.longitud !== undefined) {
+      return { latitud: input.latitud, longitud: input.longitud };
+    }
+    return { latitud: geocoding.latitud, longitud: geocoding.longitud };
   }
 
   private normalizeCreateData(data: CreateTiendaDto): CreateTiendaDto {

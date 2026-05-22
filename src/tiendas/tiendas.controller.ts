@@ -30,6 +30,7 @@ import {
 import { TiendasService } from './tiendas.service';
 import { CreateTiendaDto } from './dto/create-tienda.dto';
 import { UpdateTiendaDto } from './dto/update-tienda.dto';
+import { UpdateTiendaUbicacionDto } from './dto/update-tienda-ubicacion.dto';
 import { ValidateTiendaDireccionDto } from './dto/validate-tienda-direccion.dto';
 import { ValidateTiendaDireccionResponseDto } from './dto/validate-tienda-direccion-response.dto';
 import { AuthGuard, RolesGuard, Public, Roles } from '../common';
@@ -223,6 +224,23 @@ export class TiendasController {
   })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.tiendasService.findOne(id);
+  }
+
+  @Roles('administrador')
+  @Patch(':id/ubicacion')
+  @ApiOperation({
+    summary: 'Actualizar coordenadas de la tienda en el mapa (solo administrador)',
+    description:
+      'Permite ajustar latitud y longitud desde el mapa interactivo sin cambiar dirección ni ciudad.',
+  })
+  @ApiParam({ name: 'id', type: Number, example: 1 })
+  @ApiBody({ type: UpdateTiendaUbicacionDto })
+  @ApiOkResponse({ description: 'Ubicación actualizada', type: Tienda })
+  updateUbicacion(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateTiendaUbicacionDto,
+  ) {
+    return this.tiendasService.updateUbicacion(id, dto);
   }
 
   @Roles('administrador')

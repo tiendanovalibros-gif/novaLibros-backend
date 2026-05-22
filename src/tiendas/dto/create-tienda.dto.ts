@@ -1,10 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsNotEmpty,
+  IsNumber,
+  IsOptional,
   Matches,
   IsString,
+  Max,
   MaxLength,
+  Min,
   MinLength,
 } from 'class-validator';
 import {
@@ -47,4 +51,28 @@ export class CreateTiendaDto {
   @MinLength(2, { message: 'La ciudad debe tener al menos 2 caracteres' })
   @MaxLength(100, { message: 'La ciudad no puede superar los 100 caracteres' })
   ciudad: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Latitud opcional (ajuste manual desde mapa)',
+    example: 4.711,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber({}, { message: 'La latitud debe ser numérica' })
+  @Min(-4.5)
+  @Max(13.5)
+  latitud?: number;
+
+  @ApiProperty({
+    required: false,
+    description: 'Longitud opcional (ajuste manual desde mapa)',
+    example: -74.0721,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber({}, { message: 'La longitud debe ser numérica' })
+  @Min(-82)
+  @Max(-66)
+  longitud?: number;
 }
