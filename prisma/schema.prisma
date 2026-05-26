@@ -127,6 +127,7 @@ model Usuario {
   rol              RolUsuario
   estadoCuenta     Boolean     @map("estado_cuenta")
   fechaRegistro    DateTime    @default(now()) @map("fecha_registro") @db.Timestamptz()
+  stripeCustomerId String?     @unique @map("stripe_customer_id")
 
   reservas           Reserva[]
   carritos           CarritoCompras[]
@@ -360,6 +361,7 @@ model MetodoPago {
   tipo              TipoTarjeta
   numeroEnmascarado String      @map("numero_enmascarado")
   titular           String
+  stripePaymentMethodId String?     @map("stripe_payment_method_id")
 
   usuario          Usuario           @relation(fields: [idUsuario], references: [id])
   movimientosSaldo MovimientoSaldo[]
