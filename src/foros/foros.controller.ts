@@ -1,9 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  ParseIntPipe,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ForosService } from './foros.service';
-import { CreateForoDto } from './dto/create-foro.dto';
-import { UpdateForoDto } from './dto/update-foro.dto';
-import { AuthGuard, RolesGuard, Public, Roles } from '../common';
+import { CreateForoClienteDto } from './dto/create-foro-cliente.dto';
+import { CreateMensajeForoDto } from './dto/create-mensaje-foro.dto';
+import { AuthGuard, RolesGuard, Roles } from '../common';
+import type { JwtPayload } from '../utils';
+
+interface AuthRequest extends Request {
+  user: JwtPayload;
+}
 
 @ApiTags('foros')
 @ApiBearerAuth()
@@ -12,33 +26,74 @@ import { AuthGuard, RolesGuard, Public, Roles } from '../common';
 export class ForosController {
   constructor(private readonly forosService: ForosService) {}
 
-  @Roles('administrador')
-  @Post()
-  create(@Body() createForoDto: CreateForoDto) {
-    return this.forosService.create(createForoDto);
+  // ── Cliente ────────────────────────────────────────────────────────────────
+
+  /** Crear nuevo chat de soporte */
+  @Roles('cliente')
+  @Post('me')
+  crearMiForo(@Req() req: AuthRequest, @Body() dto: CreateForoClienteDto) {
+    return this.forosService.crearMiForo(req.user, dto);
   }
 
-  @Public()
+  /** Listar los chats del cliente autenticado */
+  @Roles('cliente')
+  @Get('me')
+  listarMisForos(@Req() req: AuthRequest) {
+    return this.forosService.listarMisForos(req.user.sub);
+  }
+
+  /** Detalle de un chat propio */
+  @Roles('cliente')
+  @Get('me/:id')
+  obtenerMiForo(@Req() req: AuthRequest, @Param('id', ParseIntPipe) id: number) {
+    return this.forosService.obtenerMiForo(id, req.user.sub);
+  }
+
+  /** Enviar mensaje en un foro propio */
+  @Roles('cliente')
+  @Post('me/:id/mensajes')
+  enviarMensajeCliente(
+    @Req() req: AuthRequest,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: CreateMensajeForoDto,
+  ) {
+    return this.forosService.enviarMensaje(id, req.user, dto);
+  }
+
+  // ── Admin / Root ───────────────────────────────────────────────────────────
+
+  /** Bandeja: todos los foros */
+  @Roles('administrador')
   @Get()
-  findAll() {
-    return this.forosService.findAll();
+  listarTodos(@Req() req: AuthRequest) {
+    return this.forosService.listarTodos(req.user);
   }
 
-  @Public()
+  /** Detalle de cualquier foro */
+  @Roles('administrador')
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.forosService.findOne(+id);
+  obtenerForo(@Req() req: AuthRequest, @Param('id', ParseIntPipe) id: number) {
+    return this.forosService.obtenerForo(id, req.user);
   }
 
+  /** Responder en cualquier foro */
   @Roles('administrador')
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateForoDto: UpdateForoDto) {
-    return this.forosService.update(+id, updateForoDto);
+  @Post(':id/mensajes')
+  enviarMensajeAdmin(
+    @Req() req: AuthRequest,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: CreateMensajeForoDto,
+  ) {
+    return this.forosService.enviarMensaje(id, req.user, dto);
   }
 
+  /** Listar mensajes de cualquier foro (para polling) */
   @Roles('administrador')
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.forosService.remove(+id);
+  @Get(':id/mensajes')
+  listarMensajesAdmin(
+    @Req() req: AuthRequest,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.forosService.listarMensajes(id, req.user);
   }
 }

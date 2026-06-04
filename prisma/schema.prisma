@@ -135,6 +135,7 @@ model Usuario {
   facturasElectronicas FacturaElectronica[]
   suscripciones      Suscripcion[]
   mensajes           Mensaje[]
+  forosCreados       Foro[]   @relation("forosCreados")
   metodosPago        MetodoPago[]
   saldoUsuario       SaldoUsuario[]
   movimientosSaldo   MovimientoSaldo[]
@@ -332,11 +333,14 @@ model Suscripcion {
 }
 
 model Foro {
-  id            Int      @id @default(autoincrement())
-  titulo        String
-  fechaCreacion DateTime @map("fecha_creacion") @db.Timestamptz()
+  id                 Int      @id @default(autoincrement())
+  titulo             String
+  fechaCreacion      DateTime @map("fecha_creacion") @db.Timestamptz()
+  idUsuarioCreador   String   @map("id_usuario_creador") @db.Uuid
+  fechaActualizacion DateTime @default(now()) @map("fecha_actualizacion") @db.Timestamptz()
 
-  mensajes Mensaje[]
+  usuarioCreador Usuario   @relation("forosCreados", fields: [idUsuarioCreador], references: [id])
+  mensajes       Mensaje[]
 
   @@map("foro")
 }

@@ -589,6 +589,7 @@ async function seedForo() {
       data: {
         titulo: 'Recomendaciones de lectura',
         fechaCreacion: new Date('2026-01-05T08:00:00Z'),
+        idUsuarioCreador: IDS.usuarioCliente,
       },
     });
     return;
@@ -596,7 +597,10 @@ async function seedForo() {
 
   await prisma.foro.update({
     where: { id: foro.id },
-    data: { fechaCreacion: new Date('2026-01-05T08:00:00Z') },
+    data: {
+      fechaCreacion: new Date('2026-01-05T08:00:00Z'),
+      idUsuarioCreador: IDS.usuarioCliente,
+    },
   });
 }
 
