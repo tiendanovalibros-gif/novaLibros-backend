@@ -29,6 +29,7 @@ import { RegistrosBusquedaModule } from './registros-busqueda/registros-busqueda
 import { BonosCumpleaniosModule } from './bonos-cumpleanios/bonos-cumpleanios.module';
 import { PreferenciasLiterariasModule } from './preferencias-literarias/preferencias-literarias.module';
 import { UsuariosPreferenciasModule } from './usuarios-preferencias/usuarios-preferencias.module';
+import { AsistenteModule } from './asistente/asistente.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { UsuariosPreferenciasModule } from './usuarios-preferencias/usuarios-pre
     BonosCumpleaniosModule,
     PreferenciasLiterariasModule,
     UsuariosPreferenciasModule,
+    AsistenteModule,
   ],
   controllers: [AppController],
   providers: [AppService],

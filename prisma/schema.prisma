@@ -45,6 +45,11 @@ enum EstadoDevolucion {
   rechazada
 }
 
+enum RolMensajeAsistente {
+  user
+  assistant
+}
+
 enum TipoTarjeta {
   credito
   debito
@@ -135,6 +140,7 @@ model Usuario {
   facturasElectronicas FacturaElectronica[]
   suscripciones      Suscripcion[]
   mensajes           Mensaje[]
+  mensajesAsistente  MensajeAsistente[]
   forosCreados       Foro[]   @relation("forosCreados")
   metodosPago        MetodoPago[]
   saldoUsuario       SaldoUsuario[]
@@ -356,6 +362,19 @@ model Mensaje {
   remitente Usuario @relation(fields: [idRemitente], references: [id])
 
   @@map("mensaje")
+}
+
+model MensajeAsistente {
+  id        String              @id @default(uuid()) @db.Uuid
+  idUsuario String              @map("id_usuario") @db.Uuid
+  rol       RolMensajeAsistente
+  contenido String
+  fechaHora DateTime            @default(now()) @map("fecha_hora") @db.Timestamptz()
+
+  usuario Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+
+  @@index([idUsuario, fechaHora])
+  @@map("mensaje_asistente")
 }
 
 model MetodoPago {
