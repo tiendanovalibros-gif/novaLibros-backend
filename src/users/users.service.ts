@@ -28,27 +28,31 @@ export class UsersService {
   }
 
   private async createWithRole(createUserDto: CreateUserDto, rol: string) {
-    const { correo, nombre } = createUserDto;
-    // Verificar si ya existe un usuario con ese correo
+    const { correo, nombre, preferencias, ...rest } = createUserDto as any;
     const existingUser = await this.prisma.usuario.findUnique({
-      where: { correo: createUserDto.correo },
+      where: { correo },
     });
 
     if (existingUser) {
       throw new ConflictException('Ya existe un usuario con ese correo');
     }
 
-    // Hashear la contraseña antes de guardarla
-    const hashedPassword = await hashPassword(createUserDto.contrasenaHash);
+    const hashedPassword = await hashPassword(rest.contrasenaHash);
 
     const newUser = await this.prisma.usuario.create({
       data: {
-        ...createUserDto,
+        ...rest,
+        correo,
+        nombre,
         rol,
-        fechaNacimiento: new Date(createUserDto.fechaNacimiento),
+        fechaNacimiento: new Date(rest.fechaNacimiento),
         contrasenaHash: hashedPassword,
       } as any,
     });
+
+    if (Array.isArray(preferencias) && preferencias.length > 0) {
+      await this.persistPreferencias(newUser.id, preferencias);
+    }
 
     this.emailService
       .sendWelcomeEmail(newUser.nombre, newUser.correo)
@@ -57,6 +61,47 @@ export class UsersService {
       });
 
     return newUser;
+  }
+
+  async getPreferencias(userId: string): Promise<{ id: number; nombre: string }[]> {
+    const rows = await this.prisma.usuarioPreferencia.findMany({
+      where: { idUsuario: userId },
+      include: { preferenciaLiteraria: true },
+    });
+    return rows.map((r) => ({
+      id: r.preferenciaLiteraria.id,
+      nombre: r.preferenciaLiteraria.nombre,
+    }));
+  }
+
+  async syncPreferencias(userId: string, nombres: string[]): Promise<{ id: number; nombre: string }[]> {
+    await this.persistPreferencias(userId, nombres);
+    return this.getPreferencias(userId);
+  }
+
+  private async persistPreferencias(userId: string, nombres: string[]): Promise<void> {
+    const unique = [...new Set(nombres.map((n) => n.trim()).filter(Boolean))];
+
+    const prefs = await Promise.all(
+      unique.map((nombre) =>
+        this.prisma.preferenciaLiteraria.upsert({
+          where: { nombre },
+          update: {},
+          create: { nombre },
+        }),
+      ),
+    );
+
+    const idsPref = prefs.map((p) => p.id);
+
+    await this.prisma.$transaction([
+      this.prisma.usuarioPreferencia.deleteMany({ where: { idUsuario: userId } }),
+      ...idsPref.map((idPreferenciaLiteraria) =>
+        this.prisma.usuarioPreferencia.create({
+          data: { idUsuario: userId, idPreferenciaLiteraria },
+        }),
+      ),
+    ]);
   }
 
   async login(correo: string, contrasena: string) {

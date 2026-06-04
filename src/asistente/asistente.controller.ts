@@ -16,13 +16,13 @@ interface AuthRequest extends Request {
 export class AsistenteController {
   constructor(private readonly asistenteService: AsistenteService) {}
 
-  @Roles('cliente')
+  @Roles('cliente', 'administrador', 'root')
   @Get('historial')
   obtenerHistorial(@Req() req: AuthRequest) {
     return this.asistenteService.obtenerHistorial(req.user.sub);
   }
 
-  @Roles('cliente')
+  @Roles('cliente', 'administrador', 'root')
   @Post('chat')
   chat(@Req() req: AuthRequest, @Body() dto: ChatAsistenteDto) {
     return this.asistenteService.chat(req.user.sub, dto);

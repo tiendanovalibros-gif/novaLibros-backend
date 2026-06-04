@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Put,
   Post,
   Body,
   Patch,
@@ -35,6 +36,15 @@ import type { JwtPayload } from '../utils';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { IsArray, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+
+class SyncPreferenciasDto {
+  @ApiProperty({ example: ['Romance', 'Thriller'], type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  nombres: string[];
+}
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -144,6 +154,23 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'No autenticado' })
   getProfile(@CurrentUser() user: JwtPayload) {
     return this.usersService.findOne(user.sub);
+  }
+
+  @Roles('cliente')
+  @Get('me/preferencias')
+  @ApiOperation({ summary: 'Listar preferencias literarias del usuario autenticado' })
+  getMisPreferencias(@CurrentUser() user: JwtPayload) {
+    return this.usersService.getPreferencias(user.sub);
+  }
+
+  @Roles('cliente')
+  @Put('me/preferencias')
+  @ApiOperation({ summary: 'Reemplazar preferencias literarias del usuario autenticado' })
+  syncMisPreferencias(
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: SyncPreferenciasDto,
+  ) {
+    return this.usersService.syncPreferencias(user.sub, dto.nombres);
   }
 
   @Roles('root', 'administrador')

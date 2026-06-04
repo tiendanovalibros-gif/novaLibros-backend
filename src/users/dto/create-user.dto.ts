@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsArray,
   IsBoolean,
   IsDateString,
   IsEmail,
@@ -62,4 +63,14 @@ export class CreateUserDto {
   @ApiProperty({ description: 'Estado de la cuenta', example: true })
   @IsBoolean()
   estadoCuenta: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Preferencias literarias del usuario (nombres)',
+    example: ['Romance', 'Thriller'],
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  preferencias?: string[];
 }

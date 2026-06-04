@@ -776,7 +776,26 @@ async function seedBonoCumpleanios() {
 }
 
 async function seedPreferenciaLiteraria() {
-  for (const nombre of ['Misterio', 'Ciencia ficcion']) {
+  for (const nombre of [
+    'Ficcion',
+    'No ficcion',
+    'Ciencia ficcion',
+    'Fantasy',
+    'Romance',
+    'Thriller',
+    'Terror',
+    'Historia',
+    'Biografia',
+    'Autoayuda',
+    'Ciencia',
+    'Filosofia',
+    'Poesia',
+    'Infantil',
+    'Juvenil',
+    'Misterio',
+    'Novela',
+    'Tecnologia',
+  ]) {
     await prisma.preferenciaLiteraria.upsert({
       where: { nombre },
       update: {},

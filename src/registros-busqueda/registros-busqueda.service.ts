@@ -11,6 +11,12 @@ export class RegistrosBusquedaService {
     return this.prisma.registroBusqueda.create({ data: createRegistrosBusquedaDto as any });
   }
 
+  createForUser(userId: string, criterio: string) {
+    return this.prisma.registroBusqueda.create({
+      data: { idUsuario: userId, criterio },
+    });
+  }
+
   findAll() {
     return this.prisma.registroBusqueda.findMany();
   }

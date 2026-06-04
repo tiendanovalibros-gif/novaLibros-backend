@@ -30,6 +30,7 @@ import { BonosCumpleaniosModule } from './bonos-cumpleanios/bonos-cumpleanios.mo
 import { PreferenciasLiterariasModule } from './preferencias-literarias/preferencias-literarias.module';
 import { UsuariosPreferenciasModule } from './usuarios-preferencias/usuarios-preferencias.module';
 import { AsistenteModule } from './asistente/asistente.module';
+import { RecomendacionesModule } from './recomendaciones/recomendaciones.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { AsistenteModule } from './asistente/asistente.module';
     PreferenciasLiterariasModule,
     UsuariosPreferenciasModule,
     AsistenteModule,
+    RecomendacionesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
