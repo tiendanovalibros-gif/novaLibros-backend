@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { PedidosService } from './pedidos.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
@@ -22,6 +31,13 @@ export class PedidosController {
   @Get()
   findAll() {
     return this.pedidosService.findAll();
+  }
+
+  // ── Nuevo ──────────────────────────────────────────────────────────────────
+  @Roles('cliente', 'administrador')
+  @Get('me')
+  findMisPedidos(@CurrentUser() currentUser: JwtPayload) {
+    return this.pedidosService.findMisPedidos(currentUser.sub);
   }
 
   @Roles('cliente', 'administrador')

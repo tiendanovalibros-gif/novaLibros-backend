@@ -24,6 +24,50 @@ export class PedidosService {
     return this.prisma.pedido.findUnique({ where: { id } });
   }
 
+  // ── Nuevo: listar pedidos del usuario autenticado ──────────────────────────
+  async findMisPedidos(idUsuario: string) {
+    const pedidos = await this.prisma.pedido.findMany({
+      where: { idUsuario },
+      include: {
+        itemsPedido: {
+          include: {
+            libro: {
+              select: {
+                id: true,
+                titulo: true,
+                isbn: true,
+                imagenPortada: true,
+              },
+            },
+          },
+          orderBy: { id: 'asc' },
+        },
+        estadosPedido: {
+          orderBy: { fechaCambio: 'desc' },
+          take: 1,
+        },
+        facturas: { select: { id: true } },
+        devoluciones: { select: { id: true, estado: true } },
+      },
+      orderBy: { fechaOrden: 'desc' },
+    });
+
+    return pedidos.map((p) => ({
+      id: p.id,
+      numeroOrden: p.numeroOrden,
+      fechaOrden: p.fechaOrden,
+      montoTotal: p.montoTotal,
+      metodoEntrega: p.metodoEntrega,
+      estadoActual: p.estadosPedido[0]?.estado ?? 'en_preparacion',
+      totalItems: p.itemsPedido.reduce((acc, i) => acc + i.cantidad, 0),
+      portadas: p.itemsPedido
+        .slice(0, 3)
+        .map((i) => i.libro.imagenPortada ?? null),
+      tieneFactura: p.facturas.length > 0,
+      devolucion: p.devoluciones[0] ?? null,
+    }));
+  }
+
   async findOneForUser(id: string, currentUser: JwtPayload) {
     const pedido = await this.prisma.pedido.findUnique({
       where: { id },
@@ -48,6 +92,8 @@ export class PedidosService {
           orderBy: { fechaCambio: 'desc' },
           take: 1,
         },
+        facturas: { select: { id: true } },
+        devoluciones: { select: { id: true, estado: true } },
       },
     });
 
@@ -92,6 +138,9 @@ export class PedidosService {
           }
         : null,
       estadoActual: pedido.estadosPedido[0]?.estado ?? 'en_preparacion',
+      tieneFactura: pedido.facturas.length > 0,
+      facturaId: pedido.facturas[0]?.id ?? null,
+      devolucion: pedido.devoluciones[0] ?? null,
       items: pedido.itemsPedido.map((item) => ({
         id: item.id,
         idLibro: item.idLibro,
@@ -104,7 +153,10 @@ export class PedidosService {
   }
 
   update(id: string, updatePedidoDto: UpdatePedidoDto) {
-    return this.prisma.pedido.update({ where: { id }, data: updatePedidoDto as any });
+    return this.prisma.pedido.update({
+      where: { id },
+      data: updatePedidoDto as any,
+    });
   }
 
   remove(id: string) {
